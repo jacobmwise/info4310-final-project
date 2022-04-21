@@ -1,9 +1,26 @@
 <!DOCTYPE html>
 <html>
     <head>
-
+        <title>INFO4310 Final Project - rcc263, jmw555</title>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
     </head>
     <body>
-
+        <div style="text-align: center;">
+            <h1>Moneyball</h1>
+            <h3>Visualizing the Recent MLB Payroll Disparity, its Reasons, and its Effects</h3>
+        </div>
+        <script>
+            const load = async function() {
+                let payrollData = await d3.csv("data/payroll.csv");
+                
+                payrollData.forEach(d => {
+                    if (d['Playoffs'] === "") {
+                        d['Playoffs'] = "N"
+                    }
+                });
+                console.log(payrollData);
+            }
+            load();
+        </script>
     </body>
 </html>
