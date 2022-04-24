@@ -14,15 +14,17 @@
                 let payrollData = await d3.csv("data/payroll.csv");
                 let gdpData = await d3.csv("data/gdp.csv");
                 let populationData = await d3.csv("data/population.csv");
+                let winsData = await d3.csv("data/wins.csv");
                 
                 payrollData.forEach(d => {
                     if (d['Playoffs'] === "") {
                         d['Playoffs'] = "N"
                     }
                 });
-                console.log(payrollData);
-                console.log(gdpData);
-                console.log(populationData)
+                // console.log(payrollData);
+                // console.log(gdpData);
+                // console.log(populationData);
+                // console.log(winsData);
             }
             load();
         </script>
