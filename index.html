@@ -12,6 +12,8 @@
         <script>
             const load = async function() {
                 let payrollData = await d3.csv("data/payroll.csv");
+                let gdpData = await d3.csv("data/gdp.csv");
+                let populationData = await d3.csv("data/population.csv");
                 
                 payrollData.forEach(d => {
                     if (d['Playoffs'] === "") {
@@ -19,6 +21,8 @@
                     }
                 });
                 console.log(payrollData);
+                console.log(gdpData);
+                console.log(populationData)
             }
             load();
         </script>
