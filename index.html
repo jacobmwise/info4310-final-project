@@ -3,11 +3,46 @@
     <head>
         <title>INFO4310 Final Project - rcc263, jmw555</title>
         <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://d3js.org/topojson.v3.min.js"></script>
+
+        <style>
+            html, body{
+                background-color: black;
+
+            }
+
+            * {
+                color: white;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+            }
+
+
+            .nation {
+                fill: slategray;
+                stroke: white;
+                stroke-width: 1px;
+            }
+
+            .outline {
+                stroke: darkgrey;
+                stroke-width: 0.5px;
+                fill: none;
+            }
+
+            /* .state{
+                cursor: pointer;
+            } */
+
+        </style>
     </head>
     <body>
         <div style="text-align: center;">
             <h1>Moneyball</h1>
             <h3>Visualizing the Recent MLB Payroll Disparity, its Reasons, and its Effects</h3>
+
+            <svg id="scatterplot"></svg>
+
+            <svg id="choropleth" height="670" width="975"></svg>
         </div>
         <script>
             const load = async function() {
@@ -15,7 +50,44 @@
                 let gdpData = await d3.csv("data/gdp.csv");
                 let populationData = await d3.csv("data/population.csv");
                 let winsData = await d3.csv("data/wins.csv");
+
+                let cityLocationsRaw = await d3.json("data/cities.json");
+
+                gdpData.forEach(metro => {
+                    metro['2020'] = Number(metro['2020'])
+                })
+
+                let gdpExtent = d3.extent(gdpData, d => d['2020']);
+
+                let gdpScale = d3.scaleLog().domain(gdpExtent).range([3, 25]);
+
+                // console.log(gdpExtent)
+
+                let cities = []
+                let cityLocations = []
+
+                populationData.forEach(city => {
+                    if (!cities.includes(city['City'])){
+                        cities.push(city['City'])
+                    }
+                })
+
+                // console.log(cities)
+
+                cityLocationsRaw.forEach(city => {
+                    if (cities.includes(city['city'])){
+                        gdpData.forEach(metro => {
+                            if (metro['Metropolitan Area'].includes(city['city'])){
+                                city['gdp'] = metro['2020']
+                                console.log(metro['2020'])
+                            }
+                        })
+                        cityLocations.push(city)
+                    } 
+                    // console.log(city['city'])
+                })
                 
+
                 payrollData.forEach(d => {
                     if (d['Playoffs'] === "") {
                         d['Playoffs'] = "N"
@@ -25,6 +97,44 @@
                 // console.log(gdpData);
                 // console.log(populationData);
                 // console.log(winsData);
+
+                const map = d3.select("#choropleth")
+
+                const us = await d3.json("/data/counties-10m.json");
+                var projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
+                var path = d3.geoPath().projection(projection);
+
+                var nation = topojson.feature(us, us.objects.nation);
+                var states = topojson.feature(us, us.objects.states);
+                var statesMesh = topojson.mesh(us, us.objects.states);
+
+                map.selectAll("path.nation").data(nation.features)
+                .join("path")
+                .attr("class", "nation")
+                .attr("d", path)
+
+                map.append("path").datum(statesMesh)
+                .attr("class", "outline")
+                .attr("d", path)
+
+                map.selectAll("path.nation").data(nation.features)
+                .join("path")
+                .attr("class", "nation")
+                .attr("d", path)
+
+                console.log(cityLocations)
+
+                map.selectAll("circle").data(cityLocations)
+                    .join("circle")
+                    // .attr("r", d => diameterScale(d['DBH']))
+                    .attr("r", d => gdpScale(d['gdp']))
+                    .attr("opacity", 0.6)
+                    // .attr("fill", d => speciesScale(d['qSpecies']))
+                    .attr("fill", "red")
+                    .attr("cx", d => projection([d['longitude'], d['latitude']])[0])
+                    .attr("cy", d => projection([d['longitude'], d['latitude']])[1])
+                    .attr("data-city", d => d['city'])
+                    .attr("stroke", "white")
             }
             load();
         </script>
