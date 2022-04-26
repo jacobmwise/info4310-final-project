@@ -40,7 +40,7 @@
             <h1>Moneyball</h1>
             <h3>Visualizing the Recent MLB Payroll Disparity, its Reasons, and its Effects</h3>
 
-            <svg id="scatterplot"></svg>
+            <svg id="scatterplot" width="500" height="500"></svg>
 
             <div id="sliderDiv" style="display: flex; flex-direction: column;">
                 <div id="slider"></div>
@@ -57,11 +57,89 @@
 
                 let cityLocationsRaw = await d3.json("data/cities.json");
 
+                payrollData.forEach(d => {
+                    if (d['Total Payroll'].slice(0,1) === '$') {
+                        d['Total Payroll'] = d['Total Payroll'].slice(1)
+                    }
+                    if (d['Total Payroll'].slice(-1) === 'M') {
+                        let decimalIndex = d['Total Payroll'].indexOf('.')
+                        let mIndex = d['Total Payroll'].indexOf('M')
+                        d['Total Payroll'] = d['Total Payroll'].slice(0,decimalIndex) + ',' + d['Total Payroll'].slice(decimalIndex + 1, mIndex)
+                        if (d['Total Payroll'].length === 5) {
+                            d['Total Payroll'] = d['Total Payroll'] + '0,000'
+                        } else {
+                            d['Total Payroll'] = d['Total Payroll'] + ',000'
+                        }
+                    }
+                    d['Total Payroll'] = Number(d['Total Payroll'].split(',').join(''))
+                    let team = winsData.filter((x) => { return (x['Team']===d['Team']) });
+                    d['Win%'] = team[0][d['Year']]
+                });
+                console.log(payrollData);
+
                 // SCATTER PLOT
                 function makeScatter(year) {
-                    // let payrollExtent = d3.extent(payrollData, d => d['Payroll']);
+                    let payrollExtent = d3.extent(payrollData, d => d['Total Payroll']);
                     let winsExtent = d3.extent(winsData, d => d[year]);
-                    // console.log(payrollExtent, winsExtent)
+
+                    const scatterplot = d3.select("#scatterplot");
+                    const scatterWidth = scatterplot.attr("width");
+                    const scatterHeight = scatterplot.attr("height");
+                    const scatterMargin = { top: 50, right: 50, bottom: 50, left: 50};
+                    const scatterAreaWidth = scatterWidth - scatterMargin.left - scatterMargin.right;
+                    const scatterAreaHeight = scatterHeight - scatterMargin.top - scatterMargin.bottom;
+
+                    let annotations = scatterplot.append("g").attr("id","annotations");
+                    const scatter = scatterplot.append("g")
+
+                    let winsScale = d3.scaleLinear().domain(winsExtent).range([scatterAreaHeight, 0]);
+                    let leftAxis = d3.axisLeft(winsScale)
+                    let leftGridlines = d3.axisLeft(winsScale)
+                                        .tickSize(-scatterAreaWidth-10)
+                                        .tickFormat("")
+                    let leftGridlinesG = annotations.append("g")
+                        .attr("class", "y gridlines")
+                        .attr("transform",`translate(${scatterMargin.left-10},${scatterMargin.top})`)
+                        .call(leftGridlines);
+                    let leftAxisG = annotations.append("g")
+                        .attr("class", "y axis")
+                        .attr("transform",`translate(${scatterMargin.left-10},${scatterMargin.top})`)
+                        .call(leftAxis)
+
+                    let payrollScale = d3.scaleLinear().domain(payrollExtent).range([0, scatterAreaWidth])
+                    let bottomAxis = d3.axisBottom(payrollScale)
+                    let bottomGridlines = d3.axisBottom(payrollScale)
+                                            .tickSize(-scatterAreaHeight-10)
+                                            .tickFormat("")
+                    let bottomGridlinesG = annotations.append("g")
+                        .attr("class", "x gridlines")
+                        .attr("transform",`translate(${scatterMargin.left},${scatterAreaHeight+scatterMargin.top+10})`)
+                        .call(bottomGridlines);
+                    let bottomAxisG =  annotations.append("g")
+                        .attr("class", "x axis")
+                        .attr("transform",`translate(${scatterMargin.left},${scatterAreaHeight+scatterMargin.top+10})`)
+                        .call(bottomAxis);
+
+                    let circles = scatter.selectAll("circle.team")
+                        .data(payrollData)
+                        .join('circle').attr("class", "team")
+                        .attr("value", d => d['Team'])
+                        .attr("cx", d => payrollScale(d['Total Payroll']))
+                        .attr("cy", d => winsScale(d['Win%']))
+                        // .attr("r", 3.5)
+                        .attr("r", 3.5)
+                        .attr("fill", "white")
+                        .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")");
+                        // .attr("stroke", d=> secondaryColors(d['team']))
+                        // .attr("stroke-width", "1.5px")
+                        // .attr("fill", d=> primaryColors(d['team']))
+                        // .style("opacity", .8)
+                        // .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
+                        // .style("filter", function(d) {
+                        //     if (topFive.includes(d)) {return "drop-shadow(2px 2px 10px rgba(240, 240, 0, 1))"}
+                        //     else 	{ return "none" }
+                        // ;})
+                        // .style("cursor", "pointer")
                 }
                 makeScatter('2021');
 
