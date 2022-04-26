@@ -69,8 +69,8 @@
                 var slider = d3.select('div#slider').append('input')
                     .attr('type', 'range').attr('id', 'yearSlider').attr('step', 1)
                     .attr('min', 2011).attr('max', 2021)
-                d3.select('div#slider').append('label').text('2021')
-                slider.on('change', function(e) {
+                d3.select('div#slider').append('label').attr('id', 'sliderLabel').text('2021')
+                slider.on('input', function(e) {
                     d3.select('label#sliderLabel').text(e.target.value);
                 });
                 d3.select('div#sliderDiv').append('label').text('Year')
