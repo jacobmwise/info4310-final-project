@@ -42,6 +42,10 @@
 
             <svg id="scatterplot"></svg>
 
+            <div id="sliderDiv" style="display: flex; flex-direction: column;">
+                <div id="slider"></div>
+            </div>
+
             <svg id="choropleth" height="670" width="975"></svg>
         </div>
         <script>
@@ -53,6 +57,26 @@
 
                 let cityLocationsRaw = await d3.json("data/cities.json");
 
+                // SCATTER PLOT
+                function makeScatter(year) {
+                    // let payrollExtent = d3.extent(payrollData, d => d['Payroll']);
+                    let winsExtent = d3.extent(winsData, d => d[year]);
+                    // console.log(payrollExtent, winsExtent)
+                }
+                makeScatter('2021');
+
+                // SLIDER
+                var slider = d3.select('div#slider').append('input')
+                    .attr('type', 'range').attr('id', 'yearSlider').attr('step', 1)
+                    .attr('min', 2011).attr('max', 2021)
+                d3.select('div#slider').append('label').text('2021')
+                slider.on('change', function(e) {
+                    d3.select('label#sliderLabel').text(e.target.value);
+                });
+                d3.select('div#sliderDiv').append('label').text('Year')
+                
+
+                // MAP
                 gdpData.forEach(metro => {
                     metro['2020'] = Number(metro['2020'])
                 })
@@ -79,7 +103,7 @@
                         gdpData.forEach(metro => {
                             if (metro['Metropolitan Area'].includes(city['city'])){
                                 city['gdp'] = metro['2020']
-                                console.log(metro['2020'])
+                                // console.log(metro['2020'])
                             }
                         })
                         cityLocations.push(city)
@@ -122,7 +146,7 @@
                 .attr("class", "nation")
                 .attr("d", path)
 
-                console.log(cityLocations)
+                // console.log(cityLocations)
 
                 map.selectAll("circle").data(cityLocations)
                     .join("circle")
