@@ -8,7 +8,6 @@
         <style>
             html, body{
                 background-color: black;
-
             }
 
             * {
@@ -78,70 +77,115 @@
                 console.log(payrollData);
 
                 // SCATTER PLOT
-                function makeScatter(year) {
-                    let payrollExtent = d3.extent(payrollData, d => d['Total Payroll']);
-                    let winsExtent = d3.extent(winsData, d => d[year]);
+                let currentData = payrollData.filter(x => { return x['Year'] === '2021'});
+                var payrollExtent = d3.extent(currentData, d => d['Total Payroll']);
+                var winsExtent = d3.extent(currentData, d => d['Win%']);
 
-                    const scatterplot = d3.select("#scatterplot");
-                    const scatterWidth = scatterplot.attr("width");
-                    const scatterHeight = scatterplot.attr("height");
-                    const scatterMargin = { top: 50, right: 50, bottom: 50, left: 50};
-                    const scatterAreaWidth = scatterWidth - scatterMargin.left - scatterMargin.right;
-                    const scatterAreaHeight = scatterHeight - scatterMargin.top - scatterMargin.bottom;
+                const scatterplot = d3.select("#scatterplot");
+                const scatterWidth = scatterplot.attr("width");
+                const scatterHeight = scatterplot.attr("height");
+                const scatterMargin = { top: 50, right: 50, bottom: 50, left: 50};
+                const scatterAreaWidth = scatterWidth - scatterMargin.left - scatterMargin.right;
+                const scatterAreaHeight = scatterHeight - scatterMargin.top - scatterMargin.bottom;
 
-                    let annotations = scatterplot.append("g").attr("id","annotations");
-                    const scatter = scatterplot.append("g")
+                let annotations = scatterplot.append("g").attr("id","annotations");
+                const scatter = scatterplot.append("g")
 
-                    let winsScale = d3.scaleLinear().domain(winsExtent).range([scatterAreaHeight, 0]);
-                    let leftAxis = d3.axisLeft(winsScale)
-                    let leftGridlines = d3.axisLeft(winsScale)
+                let winsScale = d3.scaleLinear().domain(winsExtent).range([scatterAreaHeight, 0]);
+                let defScale = d3.scaleLinear().domain([10, -10]).range([0, scatterAreaHeight]);
+                let payrollScale = d3.scaleLinear().domain(payrollExtent).range([0, scatterAreaWidth])
+
+                let leftAxis = d3.axisLeft(winsScale)
+                let leftGridlines = d3.axisLeft(winsScale)
+                                    .tickSize(-scatterAreaWidth-10)
+                                    .tickFormat("")
+                let leftGridlinesG = annotations.append("g")
+                    .attr("class", "y gridlines")
+                    .attr("transform",`translate(${scatterMargin.left-10},${scatterMargin.top})`)
+                    .call(leftGridlines);
+                let leftAxisG = annotations.append("g")
+                    .attr("class", "y axis")
+                    .attr("transform",`translate(${scatterMargin.left-10},${scatterMargin.top})`)
+                    .call(leftAxis)
+                
+                let bottomAxis = d3.axisBottom(payrollScale)
+                let bottomGridlines = d3.axisBottom(payrollScale)
+                                        .tickSize(-scatterAreaHeight-10)
+                                        .tickFormat(function(d) { return d/1000000 + 'M'});
+                let bottomGridlinesG = annotations.append("g")
+                    .attr("class", "x gridlines")
+                    .attr("transform",`translate(${scatterMargin.left},${scatterAreaHeight+scatterMargin.top+10})`)
+                    .call(bottomGridlines);
+                let bottomAxisG =  annotations.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform",`translate(${scatterMargin.left},${scatterAreaHeight+scatterMargin.top})`)
+                    .call(bottomAxis)
+
+                // scatter.append("g")
+                //     .attr('transform', 'translate(' + scatterAreaWidth/2 + ', ' + scatterAreaHeight + ')')
+                //     .append('text')
+                //     .text("Payroll (USD)")
+                //     .attr('text-anchor', 'middle')
+                // scatter.append('g')
+                //     .attr('transform', 'translate(' + 15 + ', ' + scatterAreaHeight/2 + ')')
+                //     .append('text')
+                //     .attr('text-anchor', 'middle')
+                //     .attr('transform', 'rotate(-90)')
+                //     .text("Win %")
+                
+                function plotCircles(year) {
+                    currentData = payrollData.filter(x => { return x['Year'] === year});
+                    
+                    payrollExtent = d3.extent(currentData, d => d['Total Payroll']);
+                    winsExtent = d3.extent(currentData, d => d['Win%']);
+
+                    winsScale = d3.scaleLinear().domain(winsExtent).range([scatterAreaHeight, 0]);
+                    payrollScale = d3.scaleLinear().domain(payrollExtent).range([0, scatterAreaWidth]);
+                    
+                    leftAxis = d3.axisLeft(winsScale);
+                    leftAxisG.transition().duration(350).call(leftAxis)
+                    bottomAxis = d3.axisBottom(payrollScale);
+                    bottomAxisG.transition().duration(350).call(bottomAxis)
+                        .selectAll("text").text("")
+                        
+                        .style("text-anchor", "start");
+                    leftGridlines = d3.axisLeft(winsScale)
                                         .tickSize(-scatterAreaWidth-10)
                                         .tickFormat("")
-                    let leftGridlinesG = annotations.append("g")
-                        .attr("class", "y gridlines")
-                        .attr("transform",`translate(${scatterMargin.left-10},${scatterMargin.top})`)
-                        .call(leftGridlines);
-                    let leftAxisG = annotations.append("g")
-                        .attr("class", "y axis")
-                        .attr("transform",`translate(${scatterMargin.left-10},${scatterMargin.top})`)
-                        .call(leftAxis)
-
-                    let payrollScale = d3.scaleLinear().domain(payrollExtent).range([0, scatterAreaWidth])
-                    let bottomAxis = d3.axisBottom(payrollScale)
-                    let bottomGridlines = d3.axisBottom(payrollScale)
-                                            .tickSize(-scatterAreaHeight-10)
-                                            .tickFormat("")
-                    let bottomGridlinesG = annotations.append("g")
-                        .attr("class", "x gridlines")
-                        .attr("transform",`translate(${scatterMargin.left},${scatterAreaHeight+scatterMargin.top+10})`)
-                        .call(bottomGridlines);
-                    let bottomAxisG =  annotations.append("g")
-                        .attr("class", "x axis")
-                        .attr("transform",`translate(${scatterMargin.left},${scatterAreaHeight+scatterMargin.top+10})`)
-                        .call(bottomAxis);
+                    leftGridlinesG.transition().duration(350).call(leftGridlines);
+                    bottomGridlines = d3.axisBottom(payrollScale)
+                                        .tickSize(-scatterAreaHeight-10)
+                                        .tickFormat(function(d) { return d/1000000 + 'M'});
+                    bottomGridlinesG.transition().duration(350).call(bottomGridlines);
 
                     let circles = scatter.selectAll("circle.team")
-                        .data(payrollData)
+                        .data(currentData)
                         .join('circle').attr("class", "team")
                         .attr("value", d => d['Team'])
                         .attr("cx", d => payrollScale(d['Total Payroll']))
                         .attr("cy", d => winsScale(d['Win%']))
-                        // .attr("r", 3.5)
-                        .attr("r", 3.5)
-                        .attr("fill", "white")
-                        .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")");
-                        // .attr("stroke", d=> secondaryColors(d['team']))
-                        // .attr("stroke-width", "1.5px")
-                        // .attr("fill", d=> primaryColors(d['team']))
-                        // .style("opacity", .8)
-                        // .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
-                        // .style("filter", function(d) {
-                        //     if (topFive.includes(d)) {return "drop-shadow(2px 2px 10px rgba(240, 240, 0, 1))"}
-                        //     else 	{ return "none" }
-                        // ;})
-                        // .style("cursor", "pointer")
+                        .attr("r", 5)
+                        .attr("fill", function(d) {
+                            if (d['Playoffs'] === 'Y') {return "red"}
+                            else if (d['Playoffs'] === 'WSL') { return "blue"}
+                            else if (d['Playoffs'] === 'WSW') { return "gold"}
+                            else {return "white"}
+                        })
+                        .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
+                        .on("mouseover", function(e, d) {
+                            d3.select(this)
+                                .raise()
+                                .transition().duration(250)
+                                .attr("r", 10)
+                        })
+                        .on("mouseout", function(e, d) {
+                            d3.select(this)
+                                .lower()
+                                .transition().duration(250)
+                                .attr("r", 5)
+                        });
                 }
-                makeScatter('2021');
+                plotCircles('2021');
 
                 // SLIDER
                 var slider = d3.select('div#slider').append('input')
@@ -152,6 +196,10 @@
                     d3.select('label#sliderLabel').text(e.target.value);
                 });
                 d3.select('div#sliderDiv').append('label').text('Year')
+
+                slider.on('change', function(e) {
+                    plotCircles(e.target.value);
+                });
                 
 
                 // MAP
