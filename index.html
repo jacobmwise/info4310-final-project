@@ -222,14 +222,28 @@
                     }
                 })
 
-                // console.log(cities)
+                console.log(cities)
 
                 cityLocationsRaw.forEach(city => {
                     if (cities.includes(city['city'])){
                         gdpData.forEach(metro => {
                             if (metro['Metropolitan Area'].includes(city['city'])){
                                 city['gdp'] = metro['2020']
-                                // console.log(metro['2020'])
+                                console.log(city['city'])
+                                if ( ['New York', "Los Angeles", "Chicago", "Washington, DC"].includes(city['city']) ){
+                                    if (city['city']=="New York"){
+                                        city['logos'] = ["logos/light/newyorky_l.svg", "logos/light/newyorkm_l.svg"]
+                                    } else if (city['city']=="Los Angeles"){
+                                        city['logos'] = ["logos/light/losangelesd_l.svg", "logos/light/losangelesa_l.svg"]
+                                    } else if (city['city']=="Chicago"){
+                                        city['logos'] = ["logos/light/chicagoc_l.svg", "logos/light/chicagows_l.svg"]
+                                    } else if (city['city']=="Washington, DC"){
+                                        city['logos'] = ["logos/light/washington_l.svg"]
+                                        console.log("oy")
+                                    }
+                                } else {
+                                    city['logos'] = ["logos/light/" + city['city'].toLowerCase().replace(" ", "").replace(".", "") + "_l.svg"]
+                                }
                             }
                         })
                         cityLocations.push(city)
@@ -272,7 +286,7 @@
                 .attr("class", "nation")
                 .attr("d", path)
 
-                // console.log(cityLocations)
+                console.log(cityLocations)
 
                 map.selectAll("circle").data(cityLocations)
                     .join("circle")
@@ -280,11 +294,50 @@
                     .attr("r", d => gdpScale(d['gdp']))
                     .attr("opacity", 0.6)
                     // .attr("fill", d => speciesScale(d['qSpecies']))
-                    .attr("fill", "red")
+                    .attr("fill", "green")
                     .attr("cx", d => projection([d['longitude'], d['latitude']])[0])
                     .attr("cy", d => projection([d['longitude'], d['latitude']])[1])
                     .attr("data-city", d => d['city'])
                     .attr("stroke", "white")
+
+
+                // add pseudo locations to display cities' second teams
+                cityLocations.push(
+                    {
+                        "city": "Queens", 
+                        "latitude": 40.7127837, 
+                        "longitude": -73.0059413, 
+                        "state": "New York",
+                        "logos": ["logos/light/newyorkm_l.svg"]
+                    }
+                )
+                cityLocations.push(
+                    {
+                        "city": "Anaheim", 
+                        "latitude": 33.6922342, 
+                        "longitude": -117.5436849, 
+                        "state": "California",
+                        "logos": ["logos/light/losangelesa_l.svg"]
+                    })
+                cityLocations.push(
+                    {
+                        "city": "South Chicago", 
+                        "latitude": 41.5781136, 
+                        "longitude": -87.6297982, 
+                        "state": "Illinois",
+                        "logos": ["logos/light/chicagows_l.svg"]
+
+                    })
+
+                map.selectAll("image").data(cityLocations)
+                    .join("image")
+                    .attr("opacity", 0.9)
+                    .attr("height", "20px")
+                    .attr("width", "20px")
+                    .attr("x", d => projection([d['longitude'], d['latitude']])[0] - 10 )
+                    .attr("y", d => projection([d['longitude'], d['latitude']])[1] - 10 )
+                    .attr("href", d => d['logos'][0])
+                    .attr("data-city", d => d['city'])
             }
             load();
         </script>
