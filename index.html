@@ -46,6 +46,7 @@
             </div>
 
             <svg id="choropleth" height="670" width="975"></svg>
+
         </div>
         <script>
             const load = async function() {
@@ -162,20 +163,29 @@
                                         .tickFormat(function(d) { return d/1000000 + 'M'});
                     bottomGridlinesG.transition().duration(350).call(bottomGridlines);
 
+
                     let circles = scatter.selectAll("circle.team")
                         .data(currentData)
-                        .join('circle').attr("class", "team")
+                        .join('svg')
+                        // .attr("d", function(d) {
+                        //     if (d['Playoffs'] !== 'WSW') {
+                        //         return d3.symbol().type(d3.symbolCircle).size(100)
+                        //     } else {
+                        //         return d3.symbol().type(d3.symbolStar).size(100)
+                        //     }
+                        // })
+                        .attr("id", d => d['Team'].split(" ").join(""))
                         .attr("value", d => d['Team'])
-                        .attr("cx", d => payrollScale(d['Total Payroll']))
-                        .attr("cy", d => winsScale(d['Win%']))
-                        .attr("r", 5)
-                        .attr("fill", function(d) {
-                            if (d['Playoffs'] === 'Y') {return "red"}
-                            else if (d['Playoffs'] === 'WSL') { return "blue"}
-                            else if (d['Playoffs'] === 'WSW') { return "gold"}
-                            else {return "white"}
-                        })
-                        .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
+                        .attr("x", d => payrollScale(d['Total Payroll']))
+                        .attr("y", d => winsScale(d['Win%']))
+                        // .attr("r", 5)
+                        // .attr("fill", function(d) {
+                        //     if (d['Playoffs'] === 'Y') {return "red"}
+                        //     else if (d['Playoffs'] === 'WSL') { return "blue"}
+                        //     else if (d['Playoffs'] === 'WSW') { return "gold"}
+                        //     else {return "white"}
+                        // })
+                        // .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
                         .on("mouseover", function(e, d) {
                             d3.select(this)
                                 .raise()
@@ -246,6 +256,36 @@
                                 .attr("r", 5)
                             d3.selectAll(".tooltip").remove()
                         });
+
+                    
+
+                    currentData.forEach(d => {
+                        if (d['Playoffs'] === 'WSW') {
+                            d3.select(`svg#${d['Team'].split(" ").join("")}`)
+                            .append("path")
+                            .attr("d", d3.symbol().type(d3.symbolStar).size(75))
+                            .attr("fill", "gold")
+                            .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
+                        } else if (d['Playoffs'] === 'WSL') {
+                            d3.select(`svg#${d['Team'].split(" ").join("")}`)
+                            .append("path")
+                            .attr("d", d3.symbol().type(d3.symbolStar).size(75))
+                            .attr("fill", "red")
+                            .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
+                        } else if (d['Playoffs'] === 'Y') {
+                            d3.select(`svg#${d['Team'].split(" ").join("")}`)
+                            .append("path")
+                            .attr("d", d3.symbol().type(d3.symbolCircle).size(75))
+                            .attr("fill", "red")
+                            .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
+                        } else {
+                            d3.select(`svg#${d['Team'].split(" ").join("")}`)
+                            .append("path")
+                            .attr("d", d3.symbol().type(d3.symbolCircle).size(75))
+                            .attr("fill", "white")
+                            .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
+                        }
+                    });
                 }
                 plotCircles('2021');
 
