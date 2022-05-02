@@ -62,14 +62,15 @@
                         d['Total Payroll'] = d['Total Payroll'].slice(1)
                     }
                     if (d['Total Payroll'].slice(-1) === 'M') {
-                        let decimalIndex = d['Total Payroll'].indexOf('.')
-                        let mIndex = d['Total Payroll'].indexOf('M')
-                        d['Total Payroll'] = d['Total Payroll'].slice(0,decimalIndex) + ',' + d['Total Payroll'].slice(decimalIndex + 1, mIndex)
-                        if (d['Total Payroll'].length === 5) {
-                            d['Total Payroll'] = d['Total Payroll'] + '0,000'
-                        } else {
-                            d['Total Payroll'] = d['Total Payroll'] + ',000'
-                        }
+                        // let decimalIndex = d['Total Payroll'].indexOf('.')
+                        // let mIndex = d['Total Payroll'].indexOf('M')
+                        // d['Total Payroll'] = d['Total Payroll'].slice(0,decimalIndex) + ',' + d['Total Payroll'].slice(decimalIndex + 1, mIndex)
+                        // if (d['Total Payroll'].length === 5) {
+                        //     d['Total Payroll'] = d['Total Payroll'] + '0,000'
+                        // } else {
+                        //     d['Total Payroll'] = d['Total Payroll'] + ',000'
+                        // }
+                        d['Total Payroll'] = (Number(d['Total Payroll'].substr(0, d['Total Payroll'].length-1)  * 1000000).toLocaleString())
                     }
                     d['Total Payroll'] = Number(d['Total Payroll'].split(',').join(''))
                     let team = winsData.filter((x) => { return (x['Team']===d['Team']) });
@@ -218,7 +219,7 @@
                                 .attr("y", tooltipY + 5)
                                 .style("font-size", "13px");
                             let txt2 = tooltip.append("text")
-                                .text(`Total Payroll: $${d['Total Payroll']}`)
+                                .text(`Total Payroll: $${Number(d['Total Payroll']).toLocaleString()}`)
                                 .attr("fill", "gray")
                                 .attr("text-anchor","left")
                                 .attr("alignment-baseline","hanging")
@@ -300,7 +301,7 @@
 
                 let gdpExtent = d3.extent(gdpData, d => d['2020']);
 
-                let gdpScale = d3.scaleLog().domain(gdpExtent).range([3, 25]);
+                let gdpScale = d3.scaleLinear().domain(gdpExtent).range([10, 50]);
 
                 // console.log(gdpExtent)
 
@@ -308,13 +309,14 @@
                 let cityLocations = []
 
                 populationData.forEach(city => {
-                    if (!cities.includes(city['City'])){
+                    if ((!cities.includes(city['City'])) && (city['City'] != "Oakland")){
                         cities.push(city['City'])
                     }
                 })
 
                 // console.log(cities)
 
+                //map team logos and gdps to cities
                 cityLocationsRaw.forEach(city => {
                     if (cities.includes(city['city'])){
                         gdpData.forEach(metro => {
@@ -331,7 +333,9 @@
                                     } else if (city['city']=="Washington, DC"){
                                         city['logos'] = ["logos/light/washington_l.svg"]
                                         console.log("oy")
-                                    }
+                                    } else if (city['city']=="Washington, DC"){
+                                        city['logos'] = ["logos/light/washington_l.svg"]
+                                    } 
                                 } else {
                                     city['logos'] = ["logos/light/" + city['city'].toLowerCase().replace(" ", "").replace(".", "") + "_l.svg"]
                                 }
@@ -377,10 +381,69 @@
                 .attr("class", "nation")
                 .attr("d", path)
 
-                console.log(cityLocations)
+                //hide alaska and hawaii
+                map.append("rect")
+                    .attr("fill", "black")
+                    .attr("x", 0)
+                    .attr("y", 460)
+                    .attr("height", 170)
+                    .attr("width", 300)
 
-                map.selectAll("circle").data(cityLocations)
-                    .join("circle")
+                map.append("rect")
+                    .attr("fill", "black")
+                    .attr("x", 300)
+                    .attr("y", 550)
+                    .attr("height", 150)
+                    .attr('width', 100)
+
+                const mouseover = map.append("g").attr("class","mouseover")
+                       .attr("transform",`translate(${0},${500})`)
+                       .raise();
+
+                const frame = mouseover.append("rect").attr("class","frame")
+                    .attr("x", 0).attr("y", 0)
+                    .attr("height", 93)
+                    .attr("width", 300)
+                    .attr("fill", "rgba(219, 234, 255, 0.9)")
+                    .attr("stroke", "navy")
+                    .attr("rx", 10)
+                    .raise();
+                const textbox = mouseover.append("g").attr("transform","translate(10,10)").raise();
+                // const format = d3.format(',d');
+
+                mouseover.style("opacity", 0);
+
+                function updateMouseover(city, textbox) {
+                    // d = d.toElement.__data__
+                    // hoverPct = state.datum().properties[`${d['league']} Proportion`]
+                    // pctOfLeague = 100 * d['count'] / totalsMap[d['league']]
+                
+                    //empty existing text
+                    textbox.html('');
+
+                    //set new text
+                    // let hoveredLeague = `League: ${d['league']}`;
+                    // let countText = `Number of players: ${d['count']}`;
+                    // let pctText = `Percent of population as pros: ${hoverPct.toFixed(8)}%`;
+                    // let pctLeagueText = `Percent of ${d['league']} Americans from this state: ${pctOfLeague.toFixed(4)}%`;
+
+                    //show text
+                    textbox.append("text").text(city['city'] + " Metropolitan Area")
+                        .attr("x", 0).attr("y", 10);
+                    // textbox.append("text").text(countText)
+                    //     .attr("x", 0).attr("y", 30);
+                    // textbox.append("text").text(pctText)
+                    //     .attr("x", 0).attr("y", 50);
+                    // textbox.append("text").text(pctLeagueText)
+                    //     .attr("x", 0).attr("y", 70);
+                
+                }
+
+                // console.log(cityLocations)
+
+                var nodes = map.append("g").selectAll("circle").data(cityLocations)
+                    // .join("circle")
+                    .enter().append("circle")
                     // .attr("r", d => diameterScale(d['DBH']))
                     .attr("r", d => gdpScale(d['gdp']))
                     .attr("opacity", 0.6)
@@ -390,14 +453,39 @@
                     .attr("cy", d => projection([d['longitude'], d['latitude']])[1])
                     .attr("data-city", d => d['city'])
                     .attr("stroke", "white")
+                    // .on("mouseover", function(e, d){
+                    //     console.log(d)
+                    //     mouseover.transition().duration(300).style("opacity",1);
+                    //     updateMouseover(d, textbox);
+                    // })
+                    // .on("mouseout", function(){
+                    //     mouseover.transition().duration(300).style("opacity",0);
+                    // })
 
+                    var simulation = d3.forceSimulation()
+                        // .force("center", d3.forceCenter().x(300).y(200)) // Attraction to the center of the svg area
+                        // .force("charge", d3.forceManyBody().strength(0.5)) // Nodes are attracted one each other of value is > 0
+                        .force("collide", d3.forceCollide().strength(0.2).radius(d => gdpScale(d['gdp'])).iterations(1)) // Force that avoids circle overlapping
+                        .force("x", d3.forceX(d => projection([d['longitude'], d['latitude']])[0]))
+                        .force("y", d3.forceY(d => projection([d['longitude'], d['latitude']])[1]))
+
+
+                    
+
+                    // simulation
+                    //     .nodes(cityLocations)
+                    //     .on("tick", function(d){
+                    //     nodes
+                    //         // .attr("cx", d => projection([d['longitude'], d['latitude']])[0])
+                    //         // .attr("cy", d => projection([d['longitude'], d['latitude']])[1])
+                    //     });
 
                 // add pseudo locations to display cities' second teams
                 cityLocations.push(
                     {
                         "city": "Queens", 
-                        "latitude": 40.7127837, 
-                        "longitude": -73.0059413, 
+                        "latitude": 40.8127837, 
+                        "longitude": -73.2059413, 
                         "state": "New York",
                         "logos": ["logos/light/newyorkm_l.svg"]
                     }
@@ -413,22 +501,67 @@
                 cityLocations.push(
                     {
                         "city": "South Chicago", 
-                        "latitude": 41.5781136, 
+                        "latitude": 41.2781136, 
                         "longitude": -87.6297982, 
                         "state": "Illinois",
                         "logos": ["logos/light/chicagows_l.svg"]
 
                     })
 
+                cityLocations.push(
+                    {
+                        "city": "Oakland", 
+                        "latitude": 38.4043637, 
+                        "longitude": -122.2711137, 
+                        "state": "Illinois",
+                        "logos": ["logos/light/oakland_l.svg"]
+
+                    })
+               
+
                 map.selectAll("image").data(cityLocations)
                     .join("image")
                     .attr("opacity", 0.9)
-                    .attr("height", "20px")
-                    .attr("width", "20px")
-                    .attr("x", d => projection([d['longitude'], d['latitude']])[0] - 10 )
-                    .attr("y", d => projection([d['longitude'], d['latitude']])[1] - 10 )
+                    .attr("height", "15px")
+                    .attr("width", "15px")
+                    .attr("x", d => projection([d['longitude'], d['latitude']])[0] - 7.5 )
+                    .attr("y", d => projection([d['longitude'], d['latitude']])[1] - 7.5 )
                     .attr("href", d => d['logos'][0])
                     .attr("data-city", d => d['city'])
+
+                let mouseoverNodes = map.selectAll("circle.mouseoverCircles").data(cityLocations)
+                    .join("circle")
+                    .attr("class", "mouseoverCircles")
+                    // .attr("r", d => diameterScale(d['DBH']))
+                    .attr("r", d => gdpScale(d['gdp']))
+                    .attr("opacity", 0)
+                    // .attr("fill", d => speciesScale(d['qSpecies']))
+                    .attr("fill", "green")
+                    .attr("cx", d => projection([d['longitude'], d['latitude']])[0])
+                    .attr("cy", d => projection([d['longitude'], d['latitude']])[1])
+                    .attr("data-city", d => d['city'])
+                    .attr("stroke", "none")
+                    .on("mouseover", function(e, d){
+                        console.log(d)
+                        mouseover.transition().duration(300).style("opacity",1);
+                        updateMouseover(d, textbox);
+                    })
+                    .on("mouseout", function(){
+                        mouseover.transition().duration(300).style("opacity",0);
+                    })
+
+                simulation
+                        .nodes(cityLocations)
+                        .on("tick", function(d){
+                            nodes
+                                .attr("cx", d => d.x )
+                                .attr("cy", d => d.y )
+                            
+                            mouseoverNodes
+                                .attr("cx", d => d.x )
+                                .attr("cy", d => d.y )
+                            
+                        });
             }
             load();
         </script>
