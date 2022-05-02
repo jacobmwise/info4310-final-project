@@ -137,6 +137,9 @@
                 function getNumericPixelVal(str){
                     return Number(String(str).substr(0, String(str).length-2))
                 }
+
+                let symbolMap = {'WSW': d3.symbol().type(d3.symbolStar).size(125), 'WSL': d3.symbol().type(d3.symbolStar).size(125), 'Y': d3.symbol().type(d3.symbolCircle).size(125), 'N': d3.symbol().type(d3.symbolCircle).size(125)}
+                let symbolMap2 = {'WSW': d3.symbol().type(d3.symbolStar).size(75), 'WSL': d3.symbol().type(d3.symbolStar).size(75), 'Y': d3.symbol().type(d3.symbolCircle).size(75), 'N': d3.symbol().type(d3.symbolCircle).size(75)}
                 
                 function plotCircles(year) {
                     currentData = payrollData.filter(x => { return x['Year'] === year});
@@ -162,35 +165,21 @@
                                         .tickSize(-scatterAreaHeight-10)
                                         .tickFormat(function(d) { return d/1000000 + 'M'});
                     bottomGridlinesG.transition().duration(350).call(bottomGridlines);
-
+                    
+                    scatter.selectAll("svg").remove()
 
                     let circles = scatter.selectAll("circle.team")
                         .data(currentData)
                         .join('svg')
-                        // .attr("d", function(d) {
-                        //     if (d['Playoffs'] !== 'WSW') {
-                        //         return d3.symbol().type(d3.symbolCircle).size(100)
-                        //     } else {
-                        //         return d3.symbol().type(d3.symbolStar).size(100)
-                        //     }
-                        // })
                         .attr("id", d => d['Team'].split(" ").join(""))
                         .attr("value", d => d['Team'])
                         .attr("x", d => payrollScale(d['Total Payroll']))
                         .attr("y", d => winsScale(d['Win%']))
-                        // .attr("r", 5)
-                        // .attr("fill", function(d) {
-                        //     if (d['Playoffs'] === 'Y') {return "red"}
-                        //     else if (d['Playoffs'] === 'WSL') { return "blue"}
-                        //     else if (d['Playoffs'] === 'WSW') { return "gold"}
-                        //     else {return "white"}
-                        // })
-                        // .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
                         .on("mouseover", function(e, d) {
-                            d3.select(this)
+                            d3.select(this.children[0])
                                 .raise()
+                                .attr("d", symbolMap[d['Playoffs']])
                                 .transition().duration(250)
-                                .attr("r", 10)
 
                             let tooltipWidth = 180;
                             let tooltipHeight = 70;
@@ -250,10 +239,10 @@
                                 .attr("opacity", 0.9)
                         })
                         .on("mouseout", function(e, d) {
-                            d3.select(this)
+                            d3.select(this.children[0])
                                 .lower()
+                                .attr("d", symbolMap2[d['Playoffs']])
                                 .transition().duration(250)
-                                .attr("r", 5)
                             d3.selectAll(".tooltip").remove()
                         });
 
