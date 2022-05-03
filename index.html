@@ -41,7 +41,7 @@
 
             <svg id="scatterplot" width="500" height="500"></svg>
 
-            <div id="sliderDiv" style="display: flex; flex-direction: column;">
+            <div id="sliderDiv" style="display: flex; flex-direction: column; margin-top: 20px;">
                 <div id="slider"></div>
             </div>
 
@@ -86,7 +86,7 @@
                 const scatterplot = d3.select("#scatterplot");
                 const scatterWidth = scatterplot.attr("width");
                 const scatterHeight = scatterplot.attr("height");
-                const scatterMargin = { top: 50, right: 50, bottom: 50, left: 50};
+                const scatterMargin = { top: 50, right: 50, bottom: 70, left: 70};
                 const scatterAreaWidth = scatterWidth - scatterMargin.left - scatterMargin.right;
                 const scatterAreaHeight = scatterHeight - scatterMargin.top - scatterMargin.bottom;
 
@@ -123,17 +123,21 @@
                     .attr("transform",`translate(${scatterMargin.left},${scatterAreaHeight+scatterMargin.top})`)
                     .call(bottomAxis)
 
-                // scatter.append("g")
-                //     .attr('transform', 'translate(' + scatterAreaWidth/2 + ', ' + scatterAreaHeight + ')')
-                //     .append('text')
-                //     .text("Payroll (USD)")
-                //     .attr('text-anchor', 'middle')
-                // scatter.append('g')
-                //     .attr('transform', 'translate(' + 15 + ', ' + scatterAreaHeight/2 + ')')
-                //     .append('text')
-                //     .attr('text-anchor', 'middle')
-                //     .attr('transform', 'rotate(-90)')
-                //     .text("Win %")
+                scatter.append("g")
+                    .attr('transform', 'translate(' + (scatterAreaWidth/2 + scatterMargin.left) + ', ' + (scatterAreaHeight + (scatterMargin.top * 2)) + ')')
+                    .append('text')
+                    .text("Payroll (USD)")
+                    .style("fill", "white")
+                    .style("font-size", 14)
+                    .attr('text-anchor', 'middle')
+                scatter.append('g')
+                    .attr('transform', 'translate(' + 15 + ', ' + (scatterAreaHeight/2 + scatterMargin.top) + ')')
+                    .append('text')
+                    .text("Win %")
+                    .style("fill", "white")
+                    .style("font-size", 14)
+                    .attr('text-anchor', 'middle')
+                    .attr('transform', 'rotate(-90)')
 
                 function getNumericPixelVal(str){
                     return Number(String(str).substr(0, String(str).length-2))
