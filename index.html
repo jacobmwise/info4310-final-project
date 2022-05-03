@@ -139,6 +139,8 @@
                     return Number(String(str).substr(0, String(str).length-2))
                 }
 
+                
+
                 let symbolMap = {'WSW': d3.symbol().type(d3.symbolStar).size(125), 'WSL': d3.symbol().type(d3.symbolStar).size(125), 'Y': d3.symbol().type(d3.symbolCircle).size(125), 'N': d3.symbol().type(d3.symbolCircle).size(125)}
                 let symbolMap2 = {'WSW': d3.symbol().type(d3.symbolStar).size(75), 'WSL': d3.symbol().type(d3.symbolStar).size(75), 'Y': d3.symbol().type(d3.symbolCircle).size(75), 'N': d3.symbol().type(d3.symbolCircle).size(75)}
                 
@@ -150,7 +152,7 @@
 
                     winsScale = d3.scaleLinear().domain(winsExtent).range([scatterAreaHeight, 0]);
                     payrollScale = d3.scaleLinear().domain(payrollExtent).range([0, scatterAreaWidth]);
-                    
+
                     leftAxis = d3.axisLeft(winsScale);
                     leftAxisG.transition().duration(350).call(leftAxis)
                     bottomAxis = d3.axisBottom(payrollScale);
@@ -193,6 +195,9 @@
                                 tooltipX = scatterAreaWidth+scatterMargin.left - (tooltipWidth)-2
                             } else if (tooltipX<=scatterMargin.left) {
                                 tooltipX = scatterMargin.left + 2
+                            }
+                            if (d['Total Payroll'] === payrollExtent[1]) {
+                                tooltipX = scatterAreaWidth+scatterMargin.left - (tooltipWidth)-2
                             }
                             let tooltipY = getNumericPixelVal(winsScale(d['Win%']))+scatterMargin.top-tooltipHeight-15
                             if ((tooltipY<=0)){
