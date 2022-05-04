@@ -28,6 +28,10 @@
                 fill: none;
             }
 
+            .gridlines g line{
+                stroke: grey !important;
+            }
+
             /* .state{
                 cursor: pointer;
             } */
@@ -47,6 +51,18 @@
 
             <svg id="choropleth" height="670" width="975"></svg>
 
+            <div id="citations">
+                <h3>Data Sources:</h3>
+                <!-- <ul> -->
+                    <p>MLB Win % and WS Data - <a href="https://www.teamrankings.com/mlb/stat/win-pct-all-games?date=2021-11-03">GraceNote/Nielsen via TeamRankings</a></p>
+                    <p>MLB Annual Payroll Data - <a href="http://www.stevetheump.com/Payrolls.htm">AP/MLB via SteveTheUmp.com</a></p>
+                    <p>Metro Area GDP Data (US) - <a href=https://apps.bea.gov/itable/iTable.cfm?ReqID=70&step=1&acrdn=5">US DOC Bureau of Economic Activity</a></p>
+                    <p>Metro Area GDP Data (Toronto) - <a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3610046801&cubeTimeFrame.startYear=2011&cubeTimeFrame.endYear=2018&referencePeriods=20110101%2C20180101">Statistics Canada</a></p>
+                    <p>City Population Data - <a href="">@JACOB put ur source here</a></p>
+                    <p>Geographic Coordinate Data - <a href="https://gist.github.com/Miserlou/c5cd8364bf9b2420bb29">NPM via Miserlou on GitHub Gist</a></p>
+
+                <!-- </ul> -->
+            </div>
         </div>
         <script>
             const load = async function() {
@@ -56,6 +72,35 @@
                 let winsData = await d3.csv("data/wins.csv");
 
                 let cityLocationsRaw = await d3.json("data/cities.json");
+
+                let teamsMetroDict = {
+                    "Boston": ["Red Sox"],
+                    "New York": ['Yankees', "Mets"],
+                    "Toronto": ['Blue Jays'],
+                    "Philadelphia": ['Phillies'],
+                    "Pittsburgh": ['Pirates'],
+                    "Baltimore": ['Orioles'],
+                    "Washington, DC": ['Nationals'],
+                    "Detroit": ['Tigers'],
+                    "Cleveland": ['Guardians'],
+                    "Cincinnati": ['Reds'],
+                    "Atlanta": ['Braves'],
+                    "Tampa Bay": ['Rays'],
+                    "Miami": ['Marlins'],
+                    "Houston": ['Astros'],
+                    "Dallas": ['Rangers'],
+                    "Denver": ['Rockies'],
+                    "Minneapolis": ['Twins'],
+                    "Milwaukee": ['Brewers'],
+                    "Chicago": ['Cubs', "White Sox"],
+                    "San Diego": ['Padres'],
+                    "Seattle": ['Mariners'],
+                    "San Francisco": ['Giants', "Athletics"],
+                    "Los Angeles": ['Dodgers', "Angels"],
+                    "Kansas City": ['Royals'],
+                    "St. Louis": ['Cardinals'],
+                    "Phoenix": ['Diamondbacks']
+                }
 
                 payrollData.forEach(d => {
                     if (d['Total Payroll'].slice(0,1) === '$') {
@@ -154,8 +199,8 @@
                     payrollExtent = d3.extent(currentData, d => d['Total Payroll']);
                     winsExtent = d3.extent(currentData, d => d['Win%']);
 
-                    winsScale = d3.scaleLinear().domain(winsExtent).range([scatterAreaHeight, 0]);
-                    payrollScale = d3.scaleLinear().domain(payrollExtent).range([0, scatterAreaWidth]);
+                    winsScale = d3.scaleLinear().domain([Number(winsExtent[0])-0.05, Number(winsExtent[1])+0.05]).range([scatterAreaHeight, 0]);
+                    payrollScale = d3.scaleLinear().domain([payrollExtent[0]-5000000, payrollExtent[1]+5000000]).range([0, scatterAreaWidth]);
 
                     leftAxis = d3.axisLeft(winsScale);
                     leftAxisG.transition().duration(350).call(leftAxis)
@@ -341,9 +386,6 @@
                                         city['logos'] = ["logos/light/chicagoc_l.svg", "logos/light/chicagows_l.svg"]
                                     } else if (city['city']=="Washington, DC"){
                                         city['logos'] = ["logos/light/washington_l.svg"]
-                                        console.log("oy")
-                                    } else if (city['city']=="Washington, DC"){
-                                        city['logos'] = ["logos/light/washington_l.svg"]
                                     } 
                                 } else {
                                     city['logos'] = ["logos/light/" + city['city'].toLowerCase().replace(" ", "").replace(".", "") + "_l.svg"]
@@ -437,14 +479,14 @@
                     // let pctLeagueText = `Percent of ${d['league']} Americans from this state: ${pctOfLeague.toFixed(4)}%`;
 
                     //show text
-                    textbox.append("text").text(city['city'] + " Metropolitan Area")
-                        .attr("x", 0).attr("y", 10);
-                    // textbox.append("text").text(countText)
-                    //     .attr("x", 0).attr("y", 30);
-                    // textbox.append("text").text(pctText)
-                    //     .attr("x", 0).attr("y", 50);
-                    // textbox.append("text").text(pctLeagueText)
-                    //     .attr("x", 0).attr("y", 70);
+                    textbox.append("text").text(city['city'] + " Metro Area")
+                        .attr("x", 0).attr("y", 10).style("font-weight", "bold");
+                    textbox.append("text").text("Team(s): " + teamsMetroDict[city['city']])
+                        .attr("x", 0).attr("y", 30);
+                    textbox.append("text").text("Population: " + Number(city['population']).toLocaleString())
+                        .attr("x", 0).attr("y", 50);
+                    textbox.append("text").text("Est. 2020 GDP: $" + city['gdp'].toLocaleString())
+                        .attr("x", 0).attr("y", 70);
                 
                 }
 
