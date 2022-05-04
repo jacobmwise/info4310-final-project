@@ -43,7 +43,13 @@
             <h1>Moneyball</h1>
             <h3>Visualizing the Recent MLB Payroll Disparity, its Reasons, and its Effects</h3>
 
-            <svg id="scatterplot" width="500" height="500"></svg>
+            <div style="display: flex; flex-direction: row; justify-content: center;">
+                <svg id="scatter-key" width="300" height="300"></svg>
+                <svg id="scatterplot" width="500" height="500"></svg>
+                <div id="details-div" style="display: flex; flex-direction: column; width: 30%;">
+                    <h3>Click a team to view details</h3>
+                </div>
+            </div>
 
             <div id="sliderDiv" style="display: flex; flex-direction: column; margin-top: 20px;">
                 <div id="slider"></div>
@@ -122,6 +128,17 @@
                     d['Win%'] = team[0][d['Year']]
                 });
                 console.log(payrollData);
+
+                // SCATTER KEY
+                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolStar).size(125)).attr("fill", "gold").attr("transform","translate("+30+","+130+")")
+                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolStar).size(125)).attr("fill", "red").attr("transform","translate("+30+","+160+")")
+                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolCircle).size(125)).attr("fill", "red").attr("transform","translate("+30+","+190+")")
+                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolCircle).size(125)).attr("fill", "white").attr("transform","translate("+30+","+220+")")
+                
+                d3.select("svg#scatter-key").append("text").text("World Series Winner").style("font-size", 12).attr("fill", "white").attr("transform","translate("+60+","+135+")")
+                d3.select("svg#scatter-key").append("text").text("World Series Runner-Up").style("font-size", 12).attr("fill", "white").attr("transform","translate("+60+","+165+")")
+                d3.select("svg#scatter-key").append("text").text("Made Playoffs").style("font-size", 12).attr("fill", "white").attr("transform","translate("+60+","+195+")")
+                d3.select("svg#scatter-key").append("text").text("Missed Playoffs").style("font-size", 12).attr("fill", "white").attr("transform","translate("+60+","+225+")")
 
                 // SCATTER PLOT
                 let currentData = payrollData.filter(x => { return x['Year'] === '2021'});
@@ -299,6 +316,22 @@
                                 .attr("d", symbolMap2[d['Playoffs']])
                                 .transition().duration(250)
                             d3.selectAll(".tooltip").remove()
+                        })
+                        .on("click", function(e, d) {
+                            console.log(d['Total Payroll'])
+                            d3.select("div#details-div").selectAll("*").remove()
+                            d3.select("div#details-div").append("h3").text(d['Team'])
+                            d3.select("div#details-div").append("text").text(`${d['Year']} Payroll: ${d['Total Payroll']}`).style("text-align", "left")
+                            d3.select("div#details-div").append("text").text(`Win Percentage: ${d['Win%']}`).style("text-align", "left")
+                            if (d['Playoffs'] === 'WSW') {
+                                d3.select("div#details-div").append("text").text("World Series Champion").style("text-align", "left")
+                            } else if (d['Playoffs'] === 'WSL') {
+                                d3.select("div#details-div").append("text").text("World Series Runner-Up").style("text-align", "left")
+                            } else if (d['Playoffs'] === 'Y') {
+                                d3.select("div#details-div").append("text").text("Made Playoffs").style("text-align", "left")
+                            } else {
+                                d3.select("div#details-div").append("text").text("Missed Playoffs").style("text-align", "left")
+                            }
                         });
 
                     
