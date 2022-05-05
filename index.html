@@ -46,9 +46,7 @@
             <div style="display: flex; flex-direction: row; justify-content: center;">
                 <svg id="scatter-key" width="250" height="300"></svg>
                 <svg id="scatterplot" width="600" height="550"></svg>
-                <div id="details-div" style="display: flex; flex-direction: column; width: 20%;">
-                    <h3>Click a team to view details</h3>
-                </div>
+                <div id="details-div" style="display: flex; flex-direction: column; width: 20%;"></div>
             </div>
 
             <div id="sliderDiv" style="display: flex; flex-direction: column; margin-top: 20px;">
@@ -131,15 +129,16 @@
 
                 // SCATTER KEY
                 d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolStar).size(125)).attr("fill", "gold").attr("transform","translate("+30+","+130+")")
-                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolStar).size(125)).attr("fill", "red").attr("transform","translate("+30+","+160+")")
-                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolCircle).size(125)).attr("fill", "red").attr("transform","translate("+30+","+190+")")
-                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolCircle).size(125)).attr("fill", "white").attr("transform","translate("+30+","+220+")")
+                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolStar).size(125)).attr("fill", "blue").attr("transform","translate("+30+","+160+")")
+                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolCircle).size(125)).attr("fill", "blue").attr("transform","translate("+30+","+190+")")
+                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolCircle).size(125)).attr("fill", "red").attr("transform","translate("+30+","+220+")")
                 
                 d3.select("svg#scatter-key").append("text").text("World Series Winner").style("font-size", 12).attr("fill", "white").attr("transform","translate("+60+","+135+")")
                 d3.select("svg#scatter-key").append("text").text("World Series Runner-Up").style("font-size", 12).attr("fill", "white").attr("transform","translate("+60+","+165+")")
                 d3.select("svg#scatter-key").append("text").text("Made Playoffs").style("font-size", 12).attr("fill", "white").attr("transform","translate("+60+","+195+")")
                 d3.select("svg#scatter-key").append("text").text("Missed Playoffs").style("font-size", 12).attr("fill", "white").attr("transform","translate("+60+","+225+")")
 
+            
                 // SCATTER PLOT
                 let currentData = payrollData.filter(x => { return x['Year'] === '2021'});
                 var payrollExtent = d3.extent(currentData, d => d['Total Payroll']);
@@ -207,8 +206,8 @@
 
                 
 
-                let symbolMap = {'WSW': d3.symbol().type(d3.symbolStar).size(125), 'WSL': d3.symbol().type(d3.symbolStar).size(125), 'Y': d3.symbol().type(d3.symbolCircle).size(125), 'N': d3.symbol().type(d3.symbolCircle).size(125)}
-                let symbolMap2 = {'WSW': d3.symbol().type(d3.symbolStar).size(75), 'WSL': d3.symbol().type(d3.symbolStar).size(75), 'Y': d3.symbol().type(d3.symbolCircle).size(75), 'N': d3.symbol().type(d3.symbolCircle).size(75)}
+                let symbolMap = {'WSW': d3.symbol().type(d3.symbolStar).size(150), 'WSL': d3.symbol().type(d3.symbolStar).size(150), 'Y': d3.symbol().type(d3.symbolCircle).size(150), 'N': d3.symbol().type(d3.symbolCircle).size(150)}
+                let symbolMap2 = {'WSW': d3.symbol().type(d3.symbolStar).size(100), 'WSL': d3.symbol().type(d3.symbolStar).size(100), 'Y': d3.symbol().type(d3.symbolCircle).size(100), 'N': d3.symbol().type(d3.symbolCircle).size(100)}
                 
                 function plotCircles(year) {
                     currentData = payrollData.filter(x => { return x['Year'] === year});
@@ -240,10 +239,11 @@
                     let circles = scatter.selectAll("circle.team")
                         .data(currentData)
                         .join('svg')
-                        .attr("id", d => d['Team'].split(" ").join(""))
+                        .attr("id", d => d['Team'].split('.').join("").split(" ").join(""))
                         .attr("value", d => d['Team'])
                         .attr("x", d => payrollScale(d['Total Payroll']))
                         .attr("y", d => winsScale(d['Win%']))
+                        // .style("filter", "none")
                         .on("mouseover", function(e, d) {
                             d3.select(this.children[0])
                                 .raise()
@@ -320,6 +320,7 @@
                         .on("click", function(e, d) {
                             console.log(d['Total Payroll'])
                             d3.select("div#details-div").selectAll("*").remove()
+                            buildSearch()
                             d3.select("div#details-div").append("h3").text(d['Team'])
                             d3.select("div#details-div").append("text").text(`${d['Year']} Payroll: $${d['Total Payroll'].toLocaleString()}`).style("text-align", "left")
                             d3.select("div#details-div").append("text").text(`Win Percentage: ${d['Win%']}`).style("text-align", "left")
@@ -338,33 +339,63 @@
 
                     currentData.forEach(d => {
                         if (d['Playoffs'] === 'WSW') {
-                            d3.select(`svg#${d['Team'].split(" ").join("")}`)
+                            d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
                             .append("path")
-                            .attr("d", d3.symbol().type(d3.symbolStar).size(75))
+                            .attr("d", d3.symbol().type(d3.symbolStar).size(100))
                             .attr("fill", "gold")
+                            .attr("stroke", "black")
                             .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
                         } else if (d['Playoffs'] === 'WSL') {
-                            d3.select(`svg#${d['Team'].split(" ").join("")}`)
+                            d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
                             .append("path")
-                            .attr("d", d3.symbol().type(d3.symbolStar).size(75))
-                            .attr("fill", "red")
+                            .attr("d", d3.symbol().type(d3.symbolStar).size(100))
+                            .attr("fill", "blue")
+                            .attr("stroke", "black")
                             .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
                         } else if (d['Playoffs'] === 'Y') {
-                            d3.select(`svg#${d['Team'].split(" ").join("")}`)
+                            d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
                             .append("path")
-                            .attr("d", d3.symbol().type(d3.symbolCircle).size(75))
-                            .attr("fill", "red")
+                            .attr("d", d3.symbol().type(d3.symbolCircle).size(100))
+                            .attr("fill", "blue")
+                            .attr("stroke", "black")
                             .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
                         } else {
-                            d3.select(`svg#${d['Team'].split(" ").join("")}`)
+                            d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
                             .append("path")
-                            .attr("d", d3.symbol().type(d3.symbolCircle).size(75))
-                            .attr("fill", "white")
+                            .attr("d", d3.symbol().type(d3.symbolCircle).size(100))
+                            .attr("fill", "red")
+                            .attr("stroke", "black")
                             .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
                         }
                     });
                 }
                 plotCircles('2021');
+
+                // SCATTER SEARCH
+                function buildSearch() {
+                    d3.select("div#details-div").append("p").text("Search teams:").style("margin-top", "100px")
+                    d3.select("div#details-div").append("input").attr("type", "text").style("color", "black")
+                        .on("input", function(e) {
+                            if (e.target.value === "") {
+                                console.log("hi")
+                                var unsearchedData = currentData
+                                var searchedData = []
+                            } else {
+                                var searchedData = currentData.filter(d => { return d['Team'].toLowerCase().includes(e.target.value)})
+                                var unsearchedData = currentData.filter(d => { return !d['Team'].toLowerCase().includes(e.target.value)})
+                            }
+                            searchedData.forEach(d => {
+                                let team = d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
+                                d3.select(team['_groups'][0][0].children[0]).style("stroke", "white")
+                            })
+                            unsearchedData.forEach(d => {
+                                let team = d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
+                                d3.select(team['_groups'][0][0].children[0]).style("stroke", "black")
+                            })
+                        });   
+                }
+                buildSearch()
+                d3.select("div#details-div").append("h3").text("Click a team to view details")
 
                 // SLIDER
                 var slider = d3.select('div#slider').append('input')
@@ -379,7 +410,6 @@
 
                 for (let i=2011; i<=2021; i++){
                     datalist.append("option").html(i)
-                    console.log(i)
                 }
 
                 d3.select('div#slider').append('label').attr('id', 'sliderLabel').text('2021')
