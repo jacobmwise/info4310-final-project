@@ -362,6 +362,11 @@
                             updateLineGraph(d['Team'])
                             d3.select("#teamLineGraph").style("display", "block")
                             highlightMapCircle(d['Team'])
+
+                            currentData.forEach(d => {
+                                d3.select(`rect#${d["Team"].split('.').join("").split(" ").join("")}`).attr("opacity", 0.7)
+                            })
+                            d3.select(`rect#${d["Team"].split('.').join("").split(" ").join("")}`).attr("opacity", 1)
                         });
 
                     
@@ -556,6 +561,12 @@
                 const histogram = histoSVG.append("g").attr("transform","translate("+histoMargin.left+","+histoMargin.top+")")
 
                 function buildHisto() {
+                    console.log(currentData)
+                    if (currentData[0]['Year'] === '2019') {
+                        currentData.sort((a, b) => (a['Total Payroll'] < b['Total Payroll']) ? 1 : -1)
+                    }
+
+                    histoAnnotations.selectAll("g").remove()
                     let payrollExtent = d3.extent(currentData, d => d['Total Payroll']);
                     payrollScale = d3.scaleLinear().domain([payrollExtent[0]-500000, payrollExtent[1]+500000]).range([histoAreaHeight, 0]);
 
@@ -592,25 +603,18 @@
                         .attr("transform", "rotate(90)")
                         .style("text-anchor", "start");
 
-                    histogram.append("g")
-                        .attr('transform', 'translate(' + (histoAreaWidth/2 + histoMargin.left - 50) + ', ' + (histoAreaHeight + (histoMargin.top - 10)) + ')')
-                        .append('text')
-                        .text("Team")
-                        .style("fill", "white")
-                        .style("font-size", 8)
-                        .attr('text-anchor', 'middle')
                     histogram.append('g')
-                        .attr('transform', 'translate(' + 2 + ', ' + (histoAreaHeight/2 + histoMargin.top) + ')')
+                        .attr('transform', 'translate(' + -1.5 + ', ' + (histoAreaHeight/2 + histoMargin.top) + ')')
                         .append('text')
                         .text("Payroll (USD)")
                         .style("fill", "white")
-                        .style("font-size", 8)
+                        .style("font-size", 7)
                         .attr('text-anchor', 'middle')
                         .attr('transform', 'rotate(-90)')
 
                     histogram.selectAll('rect.bar').data(currentData)
                         .join('rect').attr("class", "bar")
-                        .attr("id", d => d["Team"])
+                        .attr("id", d => d["Team"].split('.').join("").split(" ").join(""))
                         .attr("fill", "skyblue")
                         .attr("x", function(d) {
                             if (d['Team'].includes('Sox')) {
