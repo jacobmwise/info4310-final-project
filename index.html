@@ -252,6 +252,7 @@
                     
                     scatter.selectAll("svg").remove()
 
+                    let selectedCircleID = null;
                     let circles = scatter.selectAll("circle.team")
                         .data(currentData)
                         .join('svg')
@@ -335,6 +336,10 @@
                             d3.selectAll(".tooltip").remove()
                         })
                         .on("click", function(e, d) {
+                            d3.select("#" + selectedCircleID + " path").transition().duration(250).attr("stroke", "none").attr("stroke-width", "0")
+                            d3.select(this.children[0]).transition().duration(250).attr("stroke", "white").attr("stroke-width", "1.5px")
+
+                            selectedCircleID = d3.select(this).attr("id")
                             selectedTeam = d['Team']
                             console.log(d['Total Payroll'])
                             d3.select("div#details-text").selectAll("h3").remove()
