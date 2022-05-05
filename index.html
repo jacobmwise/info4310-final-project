@@ -60,12 +60,12 @@
 
                     <svg id="choropleth" height="670" width="1000"></svg>
                 </div>
-                <div id="details-div" style="display: flex; flex-direction: column; width: 25%;">
+                <div id="details-div" style="display: flex; flex-direction: column; width: 25%; padding-left: 12px; border-left-color: white; border-width: 1px; border-style: none none none solid;">
                     <div id="details-text" style="display: flex; flex-direction: column;  margin-bottom: 25px;"></div>
                     <svg id="teamLineGraph" height="250" width="300"></svg>
                 </div>
             </div>
-            <div id="citations">
+            <div id="citations" style="margin: 35px auto;">
                 <h3>Data Sources:</h3>
                 <!-- <ul> -->
                     <p>MLB Win % and WS Data - <a href="https://www.teamrankings.com/mlb/stat/win-pct-all-games?date=2021-11-03">GraceNote/Nielsen via TeamRankings</a></p>
@@ -78,20 +78,6 @@
                 <!-- </ul> -->
             </div>
 
-            <svg id="choropleth" height="670" width="975"></svg>
-
-            <div id="citations">
-                <h3>Data Sources:</h3>
-                <!-- <ul> -->
-                    <p>MLB Win % and WS Data - <a href="https://www.teamrankings.com/mlb/stat/win-pct-all-games?date=2021-11-03">GraceNote/Nielsen via TeamRankings</a></p>
-                    <p>MLB Annual Payroll Data - <a href="http://www.stevetheump.com/Payrolls.htm">AP/MLB via SteveTheUmp.com</a></p>
-                    <p>Metro Area GDP Data (US) - <a href=https://apps.bea.gov/itable/iTable.cfm?ReqID=70&step=1&acrdn=5">US DOC Bureau of Economic Activity</a></p>
-                    <p>Metro Area GDP Data (Toronto) - <a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3610046801&cubeTimeFrame.startYear=2011&cubeTimeFrame.endYear=2018&referencePeriods=20110101%2C20180101">Statistics Canada</a></p>
-                    <p>City Population Data - <a href="">@JACOB put ur source here</a></p>
-                    <p>Geographic Coordinate Data - <a href="https://gist.github.com/Miserlou/c5cd8364bf9b2420bb29">NPM via Miserlou on GitHub Gist</a></p>
-
-                <!-- </ul> -->
-            </div>
         </div>
         <script>
             const load = async function() {
@@ -913,7 +899,7 @@
                     let thisMetroID = thisMetro.toLowerCase().replace(" ", "").replace(".", "").replace(",", "");
                     console.log(thisMetroID)
                     d3.selectAll(".circleG circle").attr("fill", "green").attr("opacity", 0.6)
-                    d3.select(`#${thisMetroID} circle`).attr("fill", "skyblue").attr("opacity", 1)
+                    d3.select(`#${thisMetroID} circle`).attr("fill", "skyblue").attr("opacity", 0.9)
                 }
             }
             load();
