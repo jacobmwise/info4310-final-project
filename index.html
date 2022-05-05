@@ -63,6 +63,7 @@
                 <div id="details-div" style="display: flex; flex-direction: column; width: 25%; padding-left: 12px; border-left-color: white; border-width: 1px; border-style: none none none solid;">
                     <div id="details-text" style="display: flex; flex-direction: column;  margin-bottom: 25px;"></div>
                     <svg id="teamLineGraph" height="250" width="300"></svg>
+                    <svg id="histogram" height="300" width="300"></svg>
                 </div>
             </div>
             <div id="citations" style="margin: 35px auto;">
@@ -178,8 +179,8 @@
 
                 // SCATTER KEY
                 d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolStar).size(125)).attr("fill", "gold").attr("transform","translate("+30+","+130+")")
-                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolStar).size(125)).attr("fill", "blue").attr("transform","translate("+30+","+160+")")
-                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolCircle).size(125)).attr("fill", "blue").attr("transform","translate("+30+","+190+")")
+                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolStar).size(125)).attr("fill", "#1877F2").attr("transform","translate("+30+","+160+")")
+                d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolCircle).size(125)).attr("fill", "#1877F2").attr("transform","translate("+30+","+190+")")
                 d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolCircle).size(125)).attr("fill", "red").attr("transform","translate("+30+","+220+")")
                 
                 d3.select("svg#scatter-key").append("text").text("World Series Winner").style("font-size", 12).attr("fill", "white").attr("transform","translate("+60+","+135+")")
@@ -377,7 +378,7 @@
                             d3.select("div#details-text").append("text").text(`${d['Year']} Payroll: $${d['Total Payroll'].toLocaleString()}`).style("text-align", "left")
                             d3.select("div#details-text").append("text").text(`Win Percentage: ${d['Win%']}`).style("text-align", "left")
                             if (d['Playoffs'] === 'WSW') {
-                                d3.select("div#details#text").append("text").text("World Series Champion").style("text-align", "left")
+                                d3.select("div#details-text").append("text").text("World Series Champion").style("text-align", "left")
                             } else if (d['Playoffs'] === 'WSL') {
                                 d3.select("div#details-text").append("text").text("World Series Runner-Up").style("text-align", "left")
                             } else if (d['Playoffs'] === 'Y') {
@@ -404,14 +405,14 @@
                             d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
                             .append("path")
                             .attr("d", d3.symbol().type(d3.symbolStar).size(100))
-                            .attr("fill", "blue")
+                            .attr("fill", "#1877F2")
                             .attr("stroke", "black")
                             .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
                         } else if (d['Playoffs'] === 'Y') {
                             d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
                             .append("path")
                             .attr("d", d3.symbol().type(d3.symbolCircle).size(100))
-                            .attr("fill", "blue")
+                            .attr("fill", "#1877F2")
                             .attr("stroke", "black")
                             .attr("transform","translate("+scatterMargin.left+","+scatterMargin.top+")")
                         } else {
@@ -579,7 +580,92 @@
 
                 }
 
+                // HISTOGRAM
+                let histoSVG = d3.select("#histogram")
+                const histoWidth = histoSVG.attr("width");
+                const histoHeight = histoSVG.attr("height");
+                const histoMargin = { top: 5, right: 5, bottom: 100, left: 50};
+                const histoAreaWidth = histoWidth - histoMargin.left - histoMargin.right;
+                const histoAreaHeight = histoHeight - histoMargin.top - histoMargin.bottom;
 
+                let histoAnnotations = histoSVG.append("g").attr("id","histoAnnotations");
+                const histogram = histoSVG.append("g").attr("transform","translate("+histoMargin.left+","+histoMargin.top+")")
+
+                function buildHisto() {
+                    let payrollExtent = d3.extent(currentData, d => d['Total Payroll']);
+                    payrollScale = d3.scaleLinear().domain([payrollExtent[0]-500000, payrollExtent[1]+500000]).range([histoAreaHeight, 0]);
+
+                    let leftAxisHisto = d3.axisLeft(payrollScale).tickFormat(function(d) { return d/1000000 + 'M'});
+                    let leftAxisHistoG = histoAnnotations.append("g")
+                        .attr("class", "y axis")
+                        .attr("transform",`translate(${histoMargin.left-10},${histoMargin.top})`)
+                        .call(leftAxisHisto)
+                    
+                    
+
+                    let teamPayrolls= {}
+                    currentData.forEach(d => {
+                        if (d['Team'].includes('Sox')) {
+                            let name = d['Team'].split(' ') 
+                            teamPayrolls[name.at(-2) + ' ' + name.at(-1)] = d['Total Payroll']
+                        } else {
+                            teamPayrolls[d['Team'].split(' ').at(-1)] = d['Total Payroll']
+                        }
+                    });
+                    const teamScale = d3.scaleBand().domain(Object.keys(teamPayrolls)).range([0, histoAreaWidth])
+
+                    let bottomAxisHisto = d3.axisBottom(teamScale).tickFormat((d,i) => {
+                        return d;
+                    });
+                    let bottomAxisHistoG =  histoAnnotations.append("g")
+                        .attr("class", "x axis")
+                        .attr("transform",`translate(${histoMargin.left},${histoAreaHeight+histoMargin.top})`)
+                        .call(bottomAxisHisto)
+                        .selectAll("text")
+                        .attr("y", 0)
+                        .attr("x", 9)
+                        .attr("dy", ".35em")
+                        .attr("transform", "rotate(90)")
+                        .style("text-anchor", "start");
+
+                    histogram.append("g")
+                        .attr('transform', 'translate(' + (histoAreaWidth/2 + histoMargin.left - 50) + ', ' + (histoAreaHeight + (histoMargin.top - 10)) + ')')
+                        .append('text')
+                        .text("Team")
+                        .style("fill", "white")
+                        .style("font-size", 8)
+                        .attr('text-anchor', 'middle')
+                    histogram.append('g')
+                        .attr('transform', 'translate(' + 2 + ', ' + (histoAreaHeight/2 + histoMargin.top) + ')')
+                        .append('text')
+                        .text("Payroll (USD)")
+                        .style("fill", "white")
+                        .style("font-size", 8)
+                        .attr('text-anchor', 'middle')
+                        .attr('transform', 'rotate(-90)')
+
+                    histogram.selectAll('rect.bar').data(currentData)
+                        .join('rect').attr("class", "bar")
+                        .attr("id", d => d["Team"])
+                        .attr("fill", "skyblue")
+                        .attr("x", function(d) {
+                            if (d['Team'].includes('Sox')) {
+                                let name = d['Team'].split(' ') 
+                                // teamPayrolls[name.at(-2) + ' ' + name.at(-1)] = d['Total Payroll']
+                                return teamScale(name.at(-2) + ' ' + name.at(-1))
+                            } else {
+                                return teamScale(d["Team"].split(' ').at(-1))
+                            }
+                        })
+                        .attr("y", d => payrollScale(d["Total Payroll"]))
+                        .attr("height", d => (payrollScale(1) - payrollScale(d["Total Payroll"]) - (payrollScale(1) - payrollScale(payrollExtent[0]))))
+                        .attr("width", 10)
+                        .attr("opacity", 0.7)
+                        // .attr("transform","translate("+histoMargin.left+","+histoMargin.top+")")
+                }
+                buildHisto()
+
+                
 
 
 
@@ -607,6 +693,7 @@
 
                 slider.on('change', function(e) {
                     plotCircles(e.target.value);
+                    buildHisto()
                 });
                 
 
