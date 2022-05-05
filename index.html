@@ -36,6 +36,8 @@
                 cursor: pointer;
             } */
 
+            /* #deta */
+
         </style>
     </head>
     <body>
@@ -43,18 +45,26 @@
             <h1>Moneyball</h1>
             <h3>Visualizing the Recent MLB Payroll Disparity, its Reasons, and its Effects</h3>
 
-            <div style="display: flex; flex-direction: row; justify-content: center;">
-                <svg id="scatter-key" width="250" height="300"></svg>
-                <svg id="scatterplot" width="600" height="550"></svg>
-                <div id="details-div" style="display: flex; flex-direction: column; width: 20%;"></div>
+            <div style="display: flex;">
+                <div style="width: 75%; overflow-y:scroll; height:80vh;">
+                    <div style="display: flex; flex-direction: row; justify-content: center;">
+                        <div id="scatter-key-container">
+                            <svg id="scatter-key" width="250" height="250"></svg>
+                        </div>
+                        <svg id="scatterplot" width="600" height="550"></svg>
+                    </div>
+
+                    <div id="sliderDiv" style="display: flex; flex-direction: column; margin-top: 20px;">
+                        <div id="slider"></div>
+                    </div>
+
+                    <svg id="choropleth" height="670" width="1000"></svg>
+                </div>
+                <div id="details-div" style="display: flex; flex-direction: column; width: 25%;">
+                    <div id="details-text" style="display: flex; flex-direction: column;  margin-bottom: 25px;"></div>
+                    <svg id="teamLineGraph" height="250" width="300"></svg>
+                </div>
             </div>
-
-            <div id="sliderDiv" style="display: flex; flex-direction: column; margin-top: 20px;">
-                <div id="slider"></div>
-            </div>
-
-            <svg id="choropleth" height="670" width="1000"></svg>
-
             <div id="citations">
                 <h3>Data Sources:</h3>
                 <!-- <ul> -->
@@ -105,6 +115,44 @@
                     "St. Louis": ['Cardinals'],
                     "Phoenix": ['Diamondbacks']
                 }
+
+                let metroTeamsDict = {}
+
+                Object.keys(teamsMetroDict).forEach(function(metro){
+                    teamsMetroDict[metro].forEach(function(team){
+                        metroTeamsDict[team] = metro
+                    })
+                })
+                console.log(metroTeamsDict)
+                //     "Boston",
+                //     "New York",
+                //     "Toronto",
+                //     "Philadelphia",
+                //     "Pittsburgh",
+                //     "Baltimore": ['Orioles'],
+                //     "Washington, DC": ['Nationals'],
+                //     "Detroit": ['Tigers'],
+                //     "Cleveland": ['Guardians'],
+                //     "Cincinnati": ['Reds'],
+                //     "Atlanta": ['Braves'],
+                //     "Tampa Bay": ['Rays'],
+                //     "Miami": ['Marlins'],
+                //     "Houston": ['Astros'],
+                //     "Dallas": ['Rangers'],
+                //     "Denver": ['Rockies'],
+                //     "Minneapolis": ['Twins'],
+                //     "Milwaukee": ['Brewers'],
+                //     "Chicago": ['Cubs', "White Sox"],
+                //     "San Diego": ['Padres'],
+                //     "Seattle": ['Mariners'],
+                //     "San Francisco": ['Giants', 
+                //     "Athletics"],
+                //     "Los Angeles": ['Dodgers', 
+                //     "Angels"],
+                //     "Kansas City": ['Royals'],
+                //     "St. Louis": ['Cardinals'],
+                //     "Phoenix": ['Diamondbacks']
+                // }
 
                 payrollData.forEach(d => {
                     if (d['Total Payroll'].slice(0,1) === '$') {
@@ -243,12 +291,13 @@
                         .attr("value", d => d['Team'])
                         .attr("x", d => payrollScale(d['Total Payroll']))
                         .attr("y", d => winsScale(d['Win%']))
-                        // .style("filter", "none")
+                        .style("cursor", "pointer")
                         .on("mouseover", function(e, d) {
                             d3.select(this.children[0])
                                 .raise()
-                                .attr("d", symbolMap[d['Playoffs']])
                                 .transition().duration(250)
+                                .attr("d", symbolMap[d['Playoffs']])
+                                
 
                             let tooltipWidth = 180;
                             let tooltipHeight = 70;
@@ -313,26 +362,31 @@
                         .on("mouseout", function(e, d) {
                             d3.select(this.children[0])
                                 .lower()
-                                .attr("d", symbolMap2[d['Playoffs']])
                                 .transition().duration(250)
+                                .attr("d", symbolMap2[d['Playoffs']])
                             d3.selectAll(".tooltip").remove()
                         })
                         .on("click", function(e, d) {
                             console.log(d['Total Payroll'])
-                            d3.select("div#details-div").selectAll("*").remove()
-                            buildSearch()
-                            d3.select("div#details-div").append("h3").text(d['Team'])
-                            d3.select("div#details-div").append("text").text(`${d['Year']} Payroll: $${d['Total Payroll'].toLocaleString()}`).style("text-align", "left")
-                            d3.select("div#details-div").append("text").text(`Win Percentage: ${d['Win%']}`).style("text-align", "left")
+                            d3.select("div#details-text").selectAll("h3").remove()
+                            d3.select("div#details-text").selectAll("text").remove()
+
+                            // buildSearch()
+                            d3.select("div#details-text").append("h3").text(d['Team'])
+                            d3.select("div#details-text").append("text").text(`${d['Year']} Payroll: $${d['Total Payroll'].toLocaleString()}`).style("text-align", "left")
+                            d3.select("div#details-text").append("text").text(`Win Percentage: ${d['Win%']}`).style("text-align", "left")
                             if (d['Playoffs'] === 'WSW') {
-                                d3.select("div#details-div").append("text").text("World Series Champion").style("text-align", "left")
+                                d3.select("div#details#text").append("text").text("World Series Champion").style("text-align", "left")
                             } else if (d['Playoffs'] === 'WSL') {
-                                d3.select("div#details-div").append("text").text("World Series Runner-Up").style("text-align", "left")
+                                d3.select("div#details-text").append("text").text("World Series Runner-Up").style("text-align", "left")
                             } else if (d['Playoffs'] === 'Y') {
-                                d3.select("div#details-div").append("text").text("Made Playoffs").style("text-align", "left")
+                                d3.select("div#details-text").append("text").text("Made Playoffs").style("text-align", "left")
                             } else {
-                                d3.select("div#details-div").append("text").text("Missed Playoffs").style("text-align", "left")
+                                d3.select("div#details-text").append("text").text("Missed Playoffs").style("text-align", "left")
                             }
+
+                            updateLineGraph(d['Team'])
+                            highlightMapCircle(d['Team'])
                         });
 
                     
@@ -373,8 +427,8 @@
 
                 // SCATTER SEARCH
                 function buildSearch() {
-                    d3.select("div#details-div").append("p").text("Search teams:").style("margin-top", "100px")
-                    d3.select("div#details-div").append("input").attr("type", "text").style("color", "black")
+                    d3.select("div#scatter-key-container").append("p").text("Search teams:").style("margin-top", "100px")
+                    d3.select("div#scatter-key-container").append("input").attr("type", "text").style("color", "black")
                         .on("input", function(e) {
                             if (e.target.value === "") {
                                 console.log("hi")
@@ -395,7 +449,139 @@
                         });   
                 }
                 buildSearch()
-                d3.select("div#details-div").append("h3").text("Click a team to view details")
+                d3.select("div#details-text").append("h3").text("Click a team to view details")
+
+
+                // TEAM LINE GRAPH
+
+                let lineSVG = d3.select("#teamLineGraph")
+
+                const lineWidth = lineSVG.attr("width");
+                const lineHeight = lineSVG.attr("height");
+                const lineMargin = { top: 5, right: 5, bottom: 60, left: 50};
+                const lineAreaWidth = lineWidth - lineMargin.left - lineMargin.right;
+                const lineAreaHeight = lineHeight - lineMargin.top - lineMargin.bottom;
+
+                let lineAnnotations = lineSVG.append("g").attr("id","lineAnnotations");
+                const lineGraph = lineSVG.append("g").attr("transform","translate("+lineMargin.left+","+lineMargin.top+")")
+
+                let teamPayrollScale = d3.scaleLinear().domain([20000000,200000000]).range([lineAreaHeight, 0]);
+                // let defScale = d3.scaleLinear().domain([10, -10]).range([0, scatterAreaHeight]);
+                let timeScale = d3.scaleLinear().domain([2010.5,2021.5]).range([0, lineAreaWidth])
+
+                let leftAxisLine = d3.axisLeft(teamPayrollScale).tickFormat(function(d) { return d/1000000 + 'M'});
+                // let leftGridlines = d3.axisLeft(winsScale)
+                //                     .tickSize(-scatterAreaWidth-10)
+                //                     .tickFormat("")
+                // let leftGridlinesG = annotations.append("g")
+                //     .attr("class", "y gridlines")
+                //     .attr("transform",`translate(${scatterMargin.left-10},${scatterMargin.top})`)
+                //     .call(leftGridlines);
+                let leftAxisLineG = lineAnnotations.append("g")
+                    .attr("class", "y axis")
+                    .attr("transform",`translate(${lineMargin.left-10},${lineMargin.top})`)
+                    .call(leftAxisLine)
+                
+                let bottomAxisLine = d3.axisBottom(timeScale).tickFormat((d,i) => {
+                  return i%2 !== 0 ? " ": String(d);
+                 });
+                // let bottomGridlines = d3.axisBottom(payrollScale)
+                //                         .tickSize(-scatterAreaHeight-10)
+                //                         .tickFormat(function(d) { return d/1000000 + 'M'});
+                // let bottomGridlinesG = annotations.append("g")
+                //     .attr("class", "x gridlines")
+                //     .attr("transform",`translate(${scatterMargin.left},${scatterAreaHeight+scatterMargin.top+10})`)
+                //     .call(bottomGridlines);
+                let bottomAxisLineG =  lineAnnotations.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform",`translate(${lineMargin.left},${lineAreaHeight+lineMargin.top})`)
+                    .call(bottomAxisLine)
+
+                lineGraph.append("g")
+                    .attr('transform', 'translate(' + (lineAreaWidth/2 + lineMargin.left - 50) + ', ' + (lineAreaHeight + (lineMargin.top - 10)) + ')')
+                    .append('text')
+                    .text("Year")
+                    .style("fill", "white")
+                    .style("font-size", 8)
+                    .attr('text-anchor', 'middle')
+                lineGraph.append('g')
+                    .attr('transform', 'translate(' + 2 + ', ' + (lineAreaHeight/2 + lineMargin.top) + ')')
+                    .append('text')
+                    .text("Payroll (USD)")
+                    .style("fill", "white")
+                    .style("font-size", 8)
+                    .attr('text-anchor', 'middle')
+                    .attr('transform', 'rotate(-90)')
+
+
+                function updateLineGraph(team) {
+                    currentTeamData = payrollData.filter(x => { return x['Team'] === team});
+                    
+                    teamPayrollExtent = d3.extent(currentTeamData, d => d['Total Payroll']);
+
+                    teamPayrollScale = d3.scaleLinear().domain([teamPayrollExtent[0]-500000, teamPayrollExtent[1]+500000]).range([lineAreaHeight, 0]);
+
+                    leftAxisLine = d3.axisLeft(teamPayrollScale).tickFormat(function(d) { return d/1000000 + 'M'});;
+                    leftAxisLineG.transition().duration(350).call(leftAxisLine)
+                    // bottomAxisLine = d3.axisBottom(payrollScale);
+                    // bottomAxisG.transition().duration(350).call(bottomAxis)
+                        // .selectAll("text").text("")
+                        
+                        // .style("text-anchor", "start");
+                    // leftGridlines = d3.axisLeft(winsScale)
+                    //                     .tickSize(-scatterAreaWidth-10)
+                    //                     .tickFormat("")
+                    // leftGridlinesG.transition().duration(350).call(leftGridlines);
+                    // bottomGridlines = d3.axisBottom(payrollScale)
+                    //                     .tickSize(-scatterAreaHeight-10)
+                    //                     .tickFormat(function(d) { return d/1000000 + 'M'});
+                    // bottomGridlinesG.transition().duration(350).call(bottomGridlines);
+                    
+                    // lineGraph.selectAll("svg").remove()
+
+                    
+
+                        var lineGen = d3.line()
+                            .x(d => timeScale(d['Year']))
+                            .y(d => teamPayrollScale(d['Total Payroll']))
+                            .curve(d3.curveMonotoneX);  // this configures whether straight lines connect your data points
+                                                                    //  or if it blends between points using a curve; see d3.line docs
+                        
+                        // 4. Append a <path>, bind the data, and run the generator 
+                        //  The generator is "run" in the last command.
+                        // chartArea.append("path")
+                        //         .datum(data)
+                        //         .attr("class", "line")
+                        //         .attr("fill", "none")
+                        //         .attr("stroke", "steelblue")
+                        //         .attr("stroke-width", 3)
+                        //         .attr("d", lineGen);
+
+                    d3.select(".payrollLine").remove()
+
+                    let line = lineGraph.append("path")
+                            .datum(currentTeamData)
+                            .attr("class", "payrollLine")
+                            .attr("fill", "none")
+                            .attr("stroke", "skyblue")
+                            .attr("stroke-width", 1.5)
+                            .attr("d",lineGen)
+                        
+                    let circles = lineGraph.selectAll("circle").data(currentTeamData)
+                        .join('circle')
+                        .attr("id", d => d['Team'].split('.').join("").split(" ").join(""))
+                        .attr("value", d => d['Total Payroll'])
+                        .attr("cx", d => timeScale(d['Year']))
+                        .attr("cy", d => teamPayrollScale(d['Total Payroll']))
+                        .attr("r", 3)
+                        .attr("fill", "skyblue")
+
+                }
+
+
+
+
+
 
                 // SLIDER
                 var slider = d3.select('div#slider').append('input')
@@ -672,6 +858,23 @@
                             .attr("cy", d => d.y )
                         
                     });
+
+
+                function highlightMapCircle(fullteam){
+                    let thisMetro = null;
+                    Object.keys(metroTeamsDict).forEach(function(team){
+                    // teamsMetroDict[metro].forEach(function(team){
+                    //     metroTeamsDict[team] = metro
+                    // })
+                        if (fullteam.includes(team)){
+                            thisMetro=metroTeamsDict[team]
+                        }
+                    })
+                    let thisMetroID = thisMetro.toLowerCase().replace(" ", "").replace(".", "");
+                    console.log(thisMetroID)
+                    d3.selectAll(".circleG circle").attr("fill", "green").attr("opacity", 0.6)
+                    d3.select(`#${thisMetroID} circle`).attr("fill", "skyblue").attr("opacity", 1)
+                }
             }
             load();
         </script>
