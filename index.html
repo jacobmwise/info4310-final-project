@@ -77,6 +77,21 @@
 
                 <!-- </ul> -->
             </div>
+
+            <svg id="choropleth" height="670" width="975"></svg>
+
+            <div id="citations">
+                <h3>Data Sources:</h3>
+                <!-- <ul> -->
+                    <p>MLB Win % and WS Data - <a href="https://www.teamrankings.com/mlb/stat/win-pct-all-games?date=2021-11-03">GraceNote/Nielsen via TeamRankings</a></p>
+                    <p>MLB Annual Payroll Data - <a href="http://www.stevetheump.com/Payrolls.htm">AP/MLB via SteveTheUmp.com</a></p>
+                    <p>Metro Area GDP Data (US) - <a href=https://apps.bea.gov/itable/iTable.cfm?ReqID=70&step=1&acrdn=5">US DOC Bureau of Economic Activity</a></p>
+                    <p>Metro Area GDP Data (Toronto) - <a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3610046801&cubeTimeFrame.startYear=2011&cubeTimeFrame.endYear=2018&referencePeriods=20110101%2C20180101">Statistics Canada</a></p>
+                    <p>City Population Data - <a href="">@JACOB put ur source here</a></p>
+                    <p>Geographic Coordinate Data - <a href="https://gist.github.com/Miserlou/c5cd8364bf9b2420bb29">NPM via Miserlou on GitHub Gist</a></p>
+
+                <!-- </ul> -->
+            </div>
         </div>
         <script>
             const load = async function() {
@@ -750,7 +765,32 @@
                     .attr("cy", 0)
                     .attr("data-city", d => d['city'])
                     .attr("stroke", "white")
+                    // .on("mouseover", function(e, d){
+                    //     console.log(d)
+                    //     mouseover.transition().duration(300).style("opacity",1);
+                    //     updateMouseover(d, textbox);
+                    // })
+                    // .on("mouseout", function(){
+                    //     mouseover.transition().duration(300).style("opacity",0);
+                    // })
 
+                    var simulation = d3.forceSimulation()
+                        // .force("center", d3.forceCenter().x(300).y(200)) // Attraction to the center of the svg area
+                        // .force("charge", d3.forceManyBody().strength(0.5)) // Nodes are attracted one each other of value is > 0
+                        .force("collide", d3.forceCollide().strength(0.2).radius(d => gdpScale(d['gdp'])).iterations(1)) // Force that avoids circle overlapping
+                        .force("x", d3.forceX(d => projection([d['longitude'], d['latitude']])[0]))
+                        .force("y", d3.forceY(d => projection([d['longitude'], d['latitude']])[1]))
+
+
+                    
+
+                    // simulation
+                    //     .nodes(cityLocations)
+                    //     .on("tick", function(d){
+                    //     nodes
+                    //         // .attr("cx", d => projection([d['longitude'], d['latitude']])[0])
+                    //         // .attr("cy", d => projection([d['longitude'], d['latitude']])[1])
+                    //     });
 
                     var simulation = d3.forceSimulation()
                         .force("collide", d3.forceCollide().strength(0.2).radius(d => gdpScale(d['gdp'])).iterations(1)) // Force that avoids circle overlapping
@@ -870,7 +910,7 @@
                             thisMetro=metroTeamsDict[team]
                         }
                     })
-                    let thisMetroID = thisMetro.toLowerCase().replace(" ", "").replace(".", "");
+                    let thisMetroID = thisMetro.toLowerCase().replace(" ", "").replace(".", "").replace(",", "");
                     console.log(thisMetroID)
                     d3.selectAll(".circleG circle").attr("fill", "green").attr("opacity", 0.6)
                     d3.select(`#${thisMetroID} circle`).attr("fill", "skyblue").attr("opacity", 1)
