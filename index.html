@@ -53,7 +53,7 @@
                 <div id="slider"></div>
             </div>
 
-            <svg id="choropleth" height="670" width="975"></svg>
+            <svg id="choropleth" height="670" width="1000"></svg>
 
             <div id="citations">
                 <h3>Data Sources:</h3>
@@ -430,12 +430,11 @@
 
                 let gdpExtent = d3.extent(gdpData, d => d['2020']);
 
-                let gdpScale = d3.scaleLinear().domain(gdpExtent).range([10, 50]);
-
-                // console.log(gdpExtent)
+                let gdpScale = d3.scaleLinear().domain(gdpExtent).range([20, 80]);
 
                 let cities = []
                 let cityLocations = []
+                let citiesDict = {}
 
                 populationData.forEach(city => {
                     if ((!cities.includes(city['City'])) && (city['City'] != "Oakland")){
@@ -443,16 +442,13 @@
                     }
                 })
 
-                // console.log(cities)
-
                 //map team logos and gdps to cities
                 cityLocationsRaw.forEach(city => {
                     if (cities.includes(city['city'])){
                         gdpData.forEach(metro => {
                             if (metro['Metropolitan Area'].includes(city['city'])){
                                 city['gdp'] = metro['2020']
-                                // console.log(city['city'])
-                                if ( ['New York', "Los Angeles", "Chicago", "Washington, DC"].includes(city['city']) ){
+                                if ( ['New York', "Los Angeles", "Chicago", "Washington, DC", "San Francisco"].includes(city['city']) ){
                                     if (city['city']=="New York"){
                                         city['logos'] = ["logos/light/newyorky_l.svg", "logos/light/newyorkm_l.svg"]
                                     } else if (city['city']=="Los Angeles"){
@@ -461,6 +457,8 @@
                                         city['logos'] = ["logos/light/chicagoc_l.svg", "logos/light/chicagows_l.svg"]
                                     } else if (city['city']=="Washington, DC"){
                                         city['logos'] = ["logos/light/washington_l.svg"]
+                                    } else if (city['city']=="San Francisco"){
+                                        city['logos'] = ["logos/light/sanfrancisco_l.svg","logos/light/oakland_l.svg"]
                                     } 
                                 } else {
                                     city['logos'] = ["logos/light/" + city['city'].toLowerCase().replace(" ", "").replace(".", "") + "_l.svg"]
@@ -468,8 +466,8 @@
                             }
                         })
                         cityLocations.push(city)
+                        citiesDict[city['city']] = city
                     } 
-                    // console.log(city['city'])
                 })
                 
 
@@ -478,10 +476,6 @@
                         d['Playoffs'] = "N"
                     }
                 });
-                // console.log(payrollData);
-                // console.log(gdpData);
-                // console.log(populationData);
-                // console.log(winsData);
 
                 const map = d3.select("#choropleth")
 
@@ -540,9 +534,6 @@
                 mouseover.style("opacity", 0);
 
                 function updateMouseover(city, textbox) {
-                    // d = d.toElement.__data__
-                    // hoverPct = state.datum().properties[`${d['league']} Proportion`]
-                    // pctOfLeague = 100 * d['count'] / totalsMap[d['league']]
                 
                     //empty existing text
                     textbox.html('');
@@ -559,83 +550,90 @@
                 
                 }
 
-                // console.log(cityLocations)
-
-                var nodes = map.append("g").selectAll("circle").data(cityLocations)
-                    // .join("circle")
-                    .enter().append("circle")
-                    // .attr("r", d => diameterScale(d['DBH']))
+                var nodes = map.append("g").selectAll("g").data(cityLocations)
+                    .enter().append("g")
+                        .attr("class", "circleG")
+                        .attr("id", d => d['city'].toLowerCase().replace(" ", "").replace(".", "").replace(",", ""))
+                        .attr("transform", d => `translate(${projection([d['longitude'], d['latitude']])[0]}, ${ projection([d['longitude'], d['latitude']])[1]})`)
+                        // .attr("y", d => projection([d['longitude'], d['latitude']])[1])
+                    .append("circle")
                     .attr("r", d => gdpScale(d['gdp']))
                     .attr("opacity", 0.6)
-                    // .attr("fill", d => speciesScale(d['qSpecies']))
                     .attr("fill", "green")
-                    .attr("cx", d => projection([d['longitude'], d['latitude']])[0])
-                    .attr("cy", d => projection([d['longitude'], d['latitude']])[1])
+                    .attr("cx",0)
+                    .attr("cy", 0)
                     .attr("data-city", d => d['city'])
                     .attr("stroke", "white")
-                    // .on("mouseover", function(e, d){
-                    //     console.log(d)
-                    //     mouseover.transition().duration(300).style("opacity",1);
-                    //     updateMouseover(d, textbox);
-                    // })
-                    // .on("mouseout", function(){
-                    //     mouseover.transition().duration(300).style("opacity",0);
-                    // })
+
 
                     var simulation = d3.forceSimulation()
                         .force("collide", d3.forceCollide().strength(0.2).radius(d => gdpScale(d['gdp'])).iterations(1)) // Force that avoids circle overlapping
                         .force("x", d3.forceX(d => projection([d['longitude'], d['latitude']])[0]))
                         .force("y", d3.forceY(d => projection([d['longitude'], d['latitude']])[1]))
 
-                // add pseudo locations to display cities' second teams
-                cityLocations.push(
-                    {
-                        "city": "Queens", 
-                        "latitude": 40.8127837, 
-                        "longitude": -73.2059413, 
-                        "state": "New York",
-                        "logos": ["logos/light/newyorkm_l.svg"]
-                    }
-                )
-                cityLocations.push(
-                    {
-                        "city": "Anaheim", 
-                        "latitude": 33.6922342, 
-                        "longitude": -117.5436849, 
-                        "state": "California",
-                        "logos": ["logos/light/losangelesa_l.svg"]
-                    })
-                cityLocations.push(
-                    {
-                        "city": "South Chicago", 
-                        "latitude": 41.2781136, 
-                        "longitude": -87.6297982, 
-                        "state": "Illinois",
-                        "logos": ["logos/light/chicagows_l.svg"]
+                // // add pseudo locations to display cities' second teams
+                // cityLocations.push(
+                //     {
+                //         "city": "Queens", 
+                //         "latitude": 40.8127837, 
+                //         "longitude": -73.2059413, 
+                //         "state": "New York",
+                //         "logos": ["logos/light/newyorkm_l.svg"]
+                //     }
+                // )
+                // cityLocations.push(
+                //     {
+                //         "city": "Anaheim", 
+                //         "latitude": 33.6922342, 
+                //         "longitude": -117.5436849, 
+                //         "state": "California",
+                //         "logos": ["logos/light/losangelesa_l.svg"]
+                //     })
+                // cityLocations.push(
+                //     {
+                //         "city": "South Chicago", 
+                //         "latitude": 41.2781136, 
+                //         "longitude": -87.6297982, 
+                //         "state": "Illinois",
+                //         "logos": ["logos/light/chicagows_l.svg"]
+                //     })
 
-                    })
-
-                cityLocations.push(
-                    {
-                        "city": "Oakland", 
-                        "latitude": 38.4043637, 
-                        "longitude": -122.2711137, 
-                        "state": "Illinois",
-                        "logos": ["logos/light/oakland_l.svg"]
-
-                    })
+                // cityLocations.push(
+                //     {
+                //         "city": "Oakland", 
+                //         "latitude": 38.4043637, 
+                //         "longitude": -122.2711137, 
+                //         "state": "Illinois",
+                //         "logos": ["logos/light/oakland_l.svg"]
+                //     })
                
+                //add logos into circles
+                nodes._groups[0].forEach(function(node){
+                    let circle = d3.select(node)
+                    let city = citiesDict[circle.attr("data-city")]
+                    
+                    let offset = -10;
+                    if (city['logos'].length > 1){
+                        offset = -20
+                    }
+                    city['logos'].forEach( function(logo){
+                        let logoG = d3.select(`g#${circle.attr("data-city").toLowerCase().replace(" ", "").replace(".", "").replace(",", "")}`)
 
-                map.selectAll("image").data(cityLocations)
-                    .join("image")
-                    .attr("opacity", 0.9)
-                    .attr("height", "15px")
-                    .attr("width", "15px")
-                    .attr("x", d => projection([d['longitude'], d['latitude']])[0] - 7.5 )
-                    .attr("y", d => projection([d['longitude'], d['latitude']])[1] - 7.5 )
-                    .attr("href", d => d['logos'][0])
-                    .attr("data-city", d => d['city'])
+                        logoG.append(`image`)
+                            .attr("opacity", 0.9)
+                            .attr("height", "20px")
+                            .attr("width", "20px")
+                            .attr("x", offset )
+                            .attr("y", -10 )
+                            .attr("href", logo)
+                            .attr("data-city", city)
 
+                        offset += 22;
+                    })
+
+                })
+
+                //invisible nodes for mouseovers (to prevent logo interference)
                 let mouseoverNodes = map.selectAll("circle.mouseoverCircles").data(cityLocations)
                     .join("circle")
                     .attr("class", "mouseoverCircles")
@@ -655,12 +653,19 @@
                         mouseover.transition().duration(300).style("opacity",0);
                     })
 
+                //set simulation nodes to g tags so logos move with circles
+                let parentNodes = []
+                nodes._groups[0].forEach( function(node){
+                    parentNodes.push(node.parentElement)
+                })
+                parentNodes = d3.selectAll(parentNodes)
+
+                //run simulation
                 simulation
                     .nodes(cityLocations)
                     .on("tick", function(d){
-                        nodes
-                            .attr("cx", d => d.x )
-                            .attr("cy", d => d.y )
+                        parentNodes
+                            .attr("transform", d => `translate(${d.x}, ${d.y })`)
                         
                         mouseoverNodes
                             .attr("cx", d => d.x )
