@@ -224,7 +224,8 @@
                 let selectedTeam = null;
                 let symbolMap = {'WSW': d3.symbol().type(d3.symbolStar).size(150), 'WSL': d3.symbol().type(d3.symbolStar).size(150), 'Y': d3.symbol().type(d3.symbolCircle).size(150), 'N': d3.symbol().type(d3.symbolCircle).size(150)}
                 let symbolMap2 = {'WSW': d3.symbol().type(d3.symbolStar).size(100), 'WSL': d3.symbol().type(d3.symbolStar).size(100), 'Y': d3.symbol().type(d3.symbolCircle).size(100), 'N': d3.symbol().type(d3.symbolCircle).size(100)}
-                
+                let selectedCircleID = null;
+
                 function plotCircles(year) {
                     currentData = payrollData.filter(x => { return x['Year'] === year});
                     
@@ -252,7 +253,7 @@
                     
                     scatter.selectAll("svg").remove()
 
-                    let selectedCircleID = null;
+                    
                     let circles = scatter.selectAll("circle.team")
                         .data(currentData)
                         .join('svg')
@@ -348,7 +349,17 @@
                             // buildSearch()
                             d3.select("div#details-text").append("h3").text(d['Team'])
                             d3.select("div#details-text").append("text").text(`${d['Year']} Payroll: $${d['Total Payroll'].toLocaleString()}`).style("text-align", "left")
-                            d3.select("div#details-text").append("text").text(`Win Percentage: ${d['Win%']}`).style("text-align", "left")
+                            
+                            let wins = 0;
+                            let losses = 0
+                            if (d['Year'] == 2020){
+                                wins = Math.round(60 * Number(d['Win%']))
+                                losses = 60 - wins
+                            } else {
+                                wins =  Math.round(162 * Number(d['Win%']))
+                                losses = 162 - wins
+                            }
+                            d3.select("div#details-text").append("text").text(`Win Percentage: ${d['Win%']} (${wins}-${losses})`).style("text-align", "left")
                             if (d['Playoffs'] === 'WSW') {
                                 d3.select("div#details-text").append("text").text("World Series Champion").style("text-align", "left")
                             } else if (d['Playoffs'] === 'WSL') {
@@ -662,7 +673,8 @@
                 slider.on('change', function(e) {
                     plotCircles(e.target.value);
                     buildHisto()
-                    updateLineGraph(selectedTeam)
+                    // updateLineGraph(selectedTeam)
+                    d3.select("#" + selectedCircleID).dispatch('click')
                 });
                 
 
