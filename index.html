@@ -57,7 +57,9 @@
                 </div>
                 <div id="details-div" style="display: flex; flex-direction: column; width: 25%; padding-left: 12px; border-left-color: white; border-width: 1px; border-style: none none none solid;">
                     <div id="details-text" style="display: flex; flex-direction: column;  margin-bottom: 25px;"></div>
-                    <svg id="teamLineGraph" height="250" width="300"></svg>
+                    <h4 id="lineGraphHeader" style="display: none; text-align: center; margin: 0 0 4px;">Team Payroll Over Time</h4>
+                    <svg id="teamLineGraph" height="250" width="300" style="display: none;"></svg>
+                    <h4 style="text-align: center; margin: 0px;">Payroll Distribution</h4>
                     <svg id="histogram" height="300" width="300"></svg>
                 </div>
             </div>
@@ -122,26 +124,116 @@
                 })
                 console.log(metroTeamsDict)
 
+                let cities = []
+                let cityLocations = []
+                let citiesDict = {}
+
+                let teamLogoDict = {
+                    "Boston Red Sox": "logos/light/boston_l.svg",
+                    "New York Yankees": "logos/light/newyorky_l.svg",
+                    "New York Mets": "logos/light/newyorkm_l.svg",
+                    "Toronto Blue Jays": "logos/light/toronto_l.svg",
+                    "Philadelphia Phillies": "logos/light/philadelphia_l.svg",
+                    "Pittsburgh Pirates": "logos/light/pittsburgh_l.svg",
+                    "Baltimore Orioles": "logos/light/baltimore_l.svg",
+                    "Washington Nationals": "logos/light/washington_l.svg",
+                    "Detroit Tigers": "logos/light/detroit_l.svg",
+                    "Cleveland Guardians": "logos/light/cleveland_l.svg",
+                    "Cincinnati Reds": "logos/light/cincinnati_l.svg",
+                    "Atlanta Braves": "logos/light/atlanta_l.svg",
+                    "Tampa Bay Rays": "logos/light/tampabay_l.svg",
+                    "Miami Marlins": "logos/light/miami_l.svg",
+                    "Houston Astros": "logos/light/houston_l.svg",
+                    "Texas Rangers": "logos/light/dallas_l.svg",
+                    "Colorado Rockies": "logos/light/denver_l.svg",
+                    "Minnesota Twins": "logos/light/minneapolis_l.svg",
+                    "Milwaukee Brewers": "logos/light/milwaukee_l.svg",
+                    "Chicago Cubs": "logos/light/chicagoc_l.svg",
+                    "Chicago White Sox": "logos/light/chicagows_l.svg",
+                    "San Diego Padres": "logos/light/sandiego_l.svg",
+                    "Seattle Mariners": "logos/light/seattle_l.svg",
+                    "San Francisco Giants": "logos/light/sanfrancisco_l.svg",
+                    "Oakland Athletics": "logos/light/oakland_l.svg",
+                    "Los Angeles Dodgers": "logos/light/losangelesd_l.svg",
+                    "Los Angeles Angels": "logos/light/lasangelesa_l.svg",
+                    "Kansas City Royals": "logos/light/kansascity_l.svg",
+                    "St. Louis Cardinals": "logos/light/stlouis_l.svg",
+                    "Arizona Diamondbacks": "logos/light/phoenix_l.svg"
+                }
+
+                populationData.forEach(city => {
+                    if ((!cities.includes(city['City'])) && (city['City'] != "Oakland")){
+                        cities.push(city['City'])
+                    }
+                })
+
                 payrollData.forEach(d => {
                     if (d['Total Payroll'].slice(0,1) === '$') {
                         d['Total Payroll'] = d['Total Payroll'].slice(1)
                     }
                     if (d['Total Payroll'].slice(-1) === 'M') {
-                        // let decimalIndex = d['Total Payroll'].indexOf('.')
-                        // let mIndex = d['Total Payroll'].indexOf('M')
-                        // d['Total Payroll'] = d['Total Payroll'].slice(0,decimalIndex) + ',' + d['Total Payroll'].slice(decimalIndex + 1, mIndex)
-                        // if (d['Total Payroll'].length === 5) {
-                        //     d['Total Payroll'] = d['Total Payroll'] + '0,000'
-                        // } else {
-                        //     d['Total Payroll'] = d['Total Payroll'] + ',000'
-                        // }
                         d['Total Payroll'] = (Number(d['Total Payroll'].substr(0, d['Total Payroll'].length-1)  * 1000000).toLocaleString())
                     }
                     d['Total Payroll'] = Number(d['Total Payroll'].split(',').join(''))
                     let team = winsData.filter((x) => { return (x['Team']===d['Team']) });
                     d['Win%'] = team[0][d['Year']]
+
+                    if ((!Object.keys(teamLogoDict).includes(d['Team']))){
+                        let currCity = d['Team'].split(" ")[0]
+                        if ( ['Minnesota', "Arizona", "Texas", "Washington", "Colorado", 'New', "Los", "Chicago", "San"].includes(currCity) ){
+                            if (currCity=="Minnesota"){
+                                currCity = "#MinnesotaTwins";
+                            } else if (currCity=="Arizona"){
+                                currCity = "#ArizonaDiamondbacks";
+                            } else if (currCity=="Texas"){
+                                currCity = "#TexasRangers";
+                            } else if (currCity=="Washington"){
+                                currCity = "#WashingtonNationals";
+                            } else if (currCity=="Colorado"){
+                                currCity = "#ColoradoRockies";
+                            } 
+                        } else {
+                            scatterID = `#${d['city'].replace(" ", "").replace(".", "").replace(",", "") + clickedTeam.replace(" ", "")}`;
+                        }
+                        teamLogoDict[d['Team']] = "logos/light/" + currCity.toLowerCase().replace(" ", "").replace(".", "") + "_l.svg"
+                    }
                 });
-                console.log(payrollData);
+
+                let populations2020 = {}
+                populationData.forEach(d => {
+                    if (d['Year'] == 2020) {
+                       populations2020[d['City']] = d['Population']
+                    }
+                });
+
+                //map team logos and gdps to cities
+                payrollData.forEach(city => {
+                    if (cities.includes(city['city'])){
+                        gdpData.forEach(metro => {
+                            if (metro['Metropolitan Area'].includes(city['city'])){
+                                if ( ['New York', "Los Angeles", "Chicago", "Washington, DC", "San Francisco"].includes(city['city']) ){
+                                    if (city['city']=="New York"){
+                                        city['logos'] = ["logos/light/newyorky_l.svg", "logos/light/newyorkm_l.svg"]
+                                    } else if (city['city']=="Los Angeles"){
+                                        city['logos'] = ["logos/light/losangelesd_l.svg", "logos/light/losangelesa_l.svg"]
+                                    } else if (city['city']=="Chicago"){
+                                        city['logos'] = ["logos/light/chicagoc_l.svg", "logos/light/chicagows_l.svg"]
+                                    } else if (city['city']=="Washington, DC"){
+                                        city['logos'] = ["logos/light/washington_l.svg"]
+                                    } else if (city['city']=="San Francisco"){
+                                        city['logos'] = ["logos/light/sanfrancisco_l.svg","logos/light/oakland_l.svg"]
+                                    } 
+                                } else {
+                                    city['logos'] = ["logos/light/" + city['city'].toLowerCase().replace(" ", "").replace(".", "") + "_l.svg"]
+                                }
+                            }
+                        })
+                        cityLocations.push(city)
+                        citiesDict[city['city']] = city
+                    } 
+                })
+
+                // console.log(payrollData);
 
                 // SCATTER KEY
                 d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolStar).size(125)).attr("fill", "gold").attr("transform","translate("+30+","+130+")")
@@ -345,9 +437,13 @@
                             console.log(d['Total Payroll'])
                             d3.select("div#details-text").selectAll("h3").remove()
                             d3.select("div#details-text").selectAll("text").remove()
+                            d3.select("div#details-text").selectAll("img").remove()
 
                             // buildSearch()
-                            d3.select("div#details-text").append("h3").text(d['Team'])
+                            let header =  d3.select("div#details-text").append("div").style("display", "flex").style("justify-content","center").style("align-items","center")
+                            header.append("img").attr("src", teamLogoDict[d['Team']]).style("height", "35px").style("width", "35px").style("object-fit", "contain").style("margin-right", "10px")
+                            header.append("h3").text(d['Team'])
+
                             d3.select("div#details-text").append("text").text(`${d['Year']} Payroll: $${d['Total Payroll'].toLocaleString()}`).style("text-align", "left")
                             
                             let wins = 0;
@@ -372,6 +468,8 @@
 
                             updateLineGraph(d['Team'])
                             d3.select("#teamLineGraph").style("display", "block")
+                            d3.select("#lineGraphHeader").style("display", "block")
+
                             highlightMapCircle(d['Team'])
 
                             currentData.forEach(d => {
@@ -687,15 +785,7 @@
 
                 let gdpScale = d3.scaleLinear().domain(gdpExtent).range([20, 80]);
 
-                let cities = []
-                let cityLocations = []
-                let citiesDict = {}
-
-                populationData.forEach(city => {
-                    if ((!cities.includes(city['City'])) && (city['City'] != "Oakland")){
-                        cities.push(city['City'])
-                    }
-                })
+                
 
                 //map team logos and gdps to cities
                 cityLocationsRaw.forEach(city => {
@@ -798,7 +888,7 @@
                         .attr("x", 0).attr("y", 10).style("font-weight", "bold");
                     textbox.append("text").text("Team(s): " + teamsMetroDict[city['city']])
                         .attr("x", 0).attr("y", 30);
-                    textbox.append("text").text("Population: " + Number(city['population']).toLocaleString())
+                    textbox.append("text").text("Population: " + (populations2020[city['city']]))
                         .attr("x", 0).attr("y", 50);
                     textbox.append("text").text("Est. 2020 GDP: $" + city['gdp'].toLocaleString())
                         .attr("x", 0).attr("y", 70);
