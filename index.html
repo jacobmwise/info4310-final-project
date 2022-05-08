@@ -32,30 +32,49 @@
                 stroke: grey !important;
             }
 
+            h1{
+                font-size: 72px;
+                margin-bottom: 4px;
+                margin-top: 8px;
+            }
+
+            .introText p{
+                max-width: 1000px;
+                margin: 15px auto;
+            }
+
+            #content p {
+                max-width: 90%;
+                margin: 10px auto;
+            }
+
 
         </style>
     </head>
     <body>
         <div style="text-align: center;">
-            <h1>Moneyball</h1>
-            <h3>Visualizing the Recent MLB Payroll Disparity, its Reasons, and its Effects</h3>
+            <h1>M<img style="height: 45px; width: 45px;" src = "logos/Baseball.png" />neyball</h1>
+            <h3 style="margin-bottom: 35px;">Visualizing the Recent MLB Payroll Disparity, its Reasons, and its Effects</h3>
 
-            <p>The MLB differs from other major league professional sports such as the NFL, NBA, and NHL in one major way: there is no salary cap.
-                A salary cap is essentially an agreement amongst the league that places a limit on the amount of money a team can pay their players.
-                Although there is a luxury tax (a large fee for each dollar spent over a predetermined threshold, reaching up to 50% for second- or third- time offenders), 
-                teams are more than incentivized to pay their players big bucks as the revenue generated through tickets, merchandise, and ads when a team is winning warrants it - 
-                not to mention the pride and joy of winning a World Series.
-            </p>
-            <p>
-                This one rule is widely thought to create an extreme competitive advantage for teams located in large market cities such as New York and LA.
-                With franchise values as high as over 5 billion and others not even reaching 1 billion, and sports salaries generally increasing as time goes by, 
-                the difference in payrolls amongst MLB teams is drastic, and only growing.
-                We aim to explore teams' payrolls and geographic markets with the goal of investigating whether this competitive advantage truly exists.
-                That is, how do large market payrolls translate to regular season and playoffs success compared to small market teams.
-            </p>
+            <div class="introText">
+                <p>The MLB differs from other major league professional sports such as the NFL, NBA, and NHL in one major way: there is no salary cap.
+                    A salary cap is essentially an agreement amongst the league that places a limit on the amount of money a team can pay their players.
+                    Although there is a luxury tax (a large fee for each dollar spent over a predetermined threshold, reaching up to 50% for second- or third- time offenders), 
+                    teams are more than incentivized to pay their players big bucks as the revenue generated through tickets, merchandise, and ads when a team is winning warrants it - 
+                    not to mention the pride and joy of winning a World Series.
+                </p>
+                <p>
+                    This one rule is widely thought to create an extreme competitive advantage for teams located in large market cities such as New York and LA.
+                    With franchise values as high as over 5 billion and others not even reaching 1 billion, and sports salaries generally increasing as time goes by, 
+                    the difference in payrolls amongst MLB teams is drastic, and only growing.
+                    We aim to explore teams' payrolls and geographic markets with the goal of investigating whether this competitive advantage truly exists.
+                    That is, how do large market payrolls translate to regular season and playoffs success compared to small market teams.
+                </p>
+            </div>
 
-            <div style="display: flex;">
+            <div id = "content" style="display: flex;">
                 <div style="width: 75%; overflow-y:scroll; height:80vh;">
+                    <p>This scatterplot graphs teams' <strong>regular season winning percentages</strong> and <strong>seasonal payroll</strong>. Use the time slider below to move across the last 10 years of data. Clicking on a point will show details about the team in the side panel on the right as well as highlight its metro area on the map below. Teams can also be searched by name/city on the left.</p>
                     <div style="display: flex; flex-direction: row; justify-content: center;">
                         <div id="scatter-key-container">
                             <svg id="scatter-key" width="250" height="250"></svg>
@@ -67,7 +86,8 @@
                         <div id="slider"></div>
                     </div>
 
-                    <svg id="choropleth" height="670" width="1000"></svg>
+                    <p>The map below plots the Gross Domestic Product (GDP) of every metropolitan area in MLB. This statistic, along with population, are key measures of market size, which directly correlate with how much revenue a team will bring in. Hover over a city to see its GDP and population, or click to see where the team ranks in the scatterplot above and in the sidebar.</p>
+                    <svg id="choropleth" height="670" width="1005"></svg>
                 </div>
                 <div id="details-div" style="display: flex; flex-direction: column; width: 25%; padding-left: 12px; border-left-color: white; border-width: 1px; border-style: none none none solid;">
                     <div id="details-text" style="display: flex; flex-direction: column;  margin-bottom: 25px;"></div>
@@ -206,9 +226,7 @@
                             } else if (currCity=="Colorado"){
                                 currCity = "#ColoradoRockies";
                             } 
-                        } else {
-                            scatterID = `#${d['city'].replace(" ", "").replace(".", "").replace(",", "") + clickedTeam.replace(" ", "")}`;
-                        }
+                        } 
                         teamLogoDict[d['Team']] = "logos/light/" + currCity.toLowerCase().replace(" ", "").replace(".", "") + "_l.svg"
                     }
                 });
@@ -448,7 +466,7 @@
 
                             selectedCircleID = d3.select(this).attr("id")
                             selectedTeam = d['Team']
-                            console.log(d['Total Payroll'])
+                            // console.log(d['Total Payroll'])
                             d3.select("div#details-text").selectAll("h3").remove()
                             d3.select("div#details-text").selectAll("text").remove()
                             d3.select("div#details-text").selectAll("img").remove()
@@ -479,6 +497,16 @@
                             } else {
                                 d3.select("div#details-text").append("text").text("Missed Playoffs").style("text-align", "left")
                             }
+
+                            let thisMetro = null;
+                            Object.keys(metroTeamsDict).forEach(function(team){
+                                if (d['Team'].includes(team)){
+                                   thisMetro = metroTeamsDict[team]
+                                }
+                            })
+
+                            d3.select("div#details-text").append("text").text(`Metro GDP: $${Number(citiesDict[thisMetro]['gdp']).toLocaleString()}`).style("text-align", "left")
+
 
                             updateLineGraph(d['Team'])
                             d3.select("#teamLineGraph").style("display", "block")
