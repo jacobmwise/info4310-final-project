@@ -76,13 +76,14 @@
                     <div style="display: flex; flex-direction: row; justify-content: center;">
                         <div id="scatter-key-container">
                             <svg id="scatter-key" width="250" height="250"></svg>
+                            <div id="sliderDiv" style="display: flex; flex-direction: column; margin-top: 20px;">
+                                <div id="slider"></div>
+                            </div>
                         </div>
                         <svg id="scatterplot" width="600" height="550"></svg>
                     </div>
 
-                    <div id="sliderDiv" style="display: flex; flex-direction: column; margin-top: 20px;">
-                        <div id="slider"></div>
-                    </div>
+                    
 
                     <p>The map below plots the Gross Domestic Product (GDP) of every metropolitan area in MLB. This statistic, along with population, are key measures of market size, which directly correlate with how much revenue a team will bring in. Hover over a city to see its GDP and population, or click to see where the team ranks in the scatterplot above and in the sidebar.</p>
                     <svg id="choropleth" height="670" width="1005"></svg>
@@ -556,7 +557,7 @@
 
                 // SCATTER SEARCH
                 function buildSearch() {
-                    d3.select("div#scatter-key-container").append("p").text("Search teams:").style("margin-top", "100px")
+                    d3.select("div#scatter-key-container").append("p").text("Search teams:").style("margin-top", "10px")
                     d3.select("div#scatter-key-container").append("input").attr("type", "text").style("color", "black")
                         .on("input", function(e) {
                             if (e.target.value === "") {
@@ -792,8 +793,8 @@
                     .attr('type', 'range').attr('id', 'yearSlider').attr('step', 1)
                     .attr('min', 2011).attr('max', 2021).attr('value', 2021)
                     .attr("list", "steplist")
-                    .style("width", "400px")
-                    .style("margin", "0 15px 10px 0")
+                    .style("width", "300px")
+                    .style("margin", "0 15px 0 0")
 
                 //slider ticks
                 var datalist = d3.select('div#slider').append('datalist').attr("id", "steplist")
