@@ -739,19 +739,19 @@
                     });
                     const teamScale = d3.scaleBand().domain(Object.keys(teamPayrolls)).range([0, histoAreaWidth])
 
-                    let bottomAxisHisto = d3.axisBottom(teamScale).tickFormat((d,i) => {
-                        return d;
-                    });
+                    let bottomAxisHisto = d3.axisBottom(teamScale).tickFormat("")
                     let bottomAxisHistoG =  histoAnnotations.append("g")
-                        .attr("class", "x axis")
+                        .attr("class", "xaxis")
                         .attr("transform",`translate(${histoMargin.left},${histoAreaHeight+histoMargin.top})`)
                         .call(bottomAxisHisto)
-                        .selectAll("text")
-                        .attr("y", 0)
-                        .attr("x", 9)
-                        .attr("dy", ".35em")
-                        .attr("transform", "rotate(90)")
-                        .style("text-anchor", "start");
+                        // .selectAll("text")
+                        // .attr("y", 0)
+                        // .attr("x", 9)
+                        // .attr("dy", ".35em")
+                        // .attr("transform", "rotate(90)")
+                        // .style("text-anchor", "start");
+
+                    d3.select("g.xaxis").selectAll(".tick").remove()
 
                     histogram.append('g')
                         .attr('transform', 'translate(' + -1.5 + ', ' + (histoAreaHeight/2 + histoMargin.top) + ')')
@@ -761,6 +761,15 @@
                         .style("font-size", 7)
                         .attr('text-anchor', 'middle')
                         .attr('transform', 'rotate(-90)')
+
+                    histogram.append('g')
+                        .attr('transform', 'translate(' + histoAreaWidth/2 + ', ' + (histoAreaHeight + 15) + ')')
+                        .append('text')
+                        .text("Team Distribution")
+                        .style("fill", "white")
+                        .style("font-size", 10)
+                        .attr('text-anchor', 'middle')
+                        // .attr('transform', 'rotate(-90)')
 
                     histogram.selectAll('rect.bar').data(currentData)
                         .join('rect').attr("class", "bar")
