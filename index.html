@@ -41,6 +41,7 @@
             .introText p{
                 max-width: 1000px;
                 margin: 15px auto;
+                line-height: 1.5em;
             }
 
             #content p {
@@ -71,7 +72,7 @@
             </div>
 
             <div id = "content" style="display: flex;">
-                <div style="width: 75%; overflow-y:scroll; height:80vh;">
+                <div style="width: 75%; overflow-x: clip; overflow-y:scroll; height:90vh;">
                     <p>This scatterplot graphs teams' <strong>regular season winning percentages</strong> and <strong>seasonal payroll</strong>. Use the time slider below to move across the last 10 years of data. Clicking on a point will show details about the team in the side panel on the right as well as highlight its metro area on the map below. Teams can also be searched by name/city on the left.</p>
                     <div style="display: flex; flex-direction: row; justify-content: center;">
                         <div id="scatter-key-container">
@@ -86,14 +87,14 @@
                     
 
                     <p>The map below plots the Gross Domestic Product (GDP) of every metropolitan area in MLB. This statistic, along with population, are key measures of market size, which directly correlate with how much revenue a team will bring in. Hover over a city to see its GDP and population, or click to see where the team ranks in the scatterplot above and in the sidebar.</p>
-                    <svg id="choropleth" height="670" width="1005"></svg>
+                    <svg id="choropleth" height="570" width="1015"></svg>
                 </div>
                 <div id="details-div" style="display: flex; flex-direction: column; width: 25%; padding-left: 12px; border-left-color: white; border-width: 1px; border-style: none none none solid;">
                     <div id="details-text" style="display: flex; flex-direction: column;  margin-bottom: 25px;"></div>
                     <h4 id="lineGraphHeader" style="display: none; text-align: center; margin: 0 0 4px;">Team Payroll Over Time</h4>
                     <svg id="teamLineGraph" height="250" width="300" style="display: none;"></svg>
-                    <h4 style="text-align: center; margin: 0px;">Payroll Distribution</h4>
-                    <svg id="histogram" height="300" width="300"></svg>
+                    <h4 style="text-align: center; margin: 3px;">Payroll Distribution</h4>
+                    <svg id="histogram" height="230" width="300"></svg>
                 </div>
             </div>
             <div id="citations" style="margin: 35px auto;">
@@ -188,7 +189,7 @@
                     "San Francisco Giants": "logos/light/sanfrancisco_l.svg",
                     "Oakland Athletics": "logos/light/oakland_l.svg",
                     "Los Angeles Dodgers": "logos/light/losangelesd_l.svg",
-                    "Los Angeles Angels": "logos/light/lasangelesa_l.svg",
+                    "Los Angeles Angels": "logos/light/losangelesa_l.svg",
                     "Kansas City Royals": "logos/light/kansascity_l.svg",
                     "St. Louis Cardinals": "logos/light/stlouis_l.svg",
                     "Arizona Diamondbacks": "logos/light/phoenix_l.svg"
@@ -561,16 +562,16 @@
                     d3.select("div#scatter-key-container").append("input").attr("type", "text").style("color", "black")
                         .on("input", function(e) {
                             if (e.target.value === "") {
-                                console.log("hi")
+                                console.log("empty search")
                                 var unsearchedData = currentData
                                 var searchedData = []
                             } else {
-                                var searchedData = currentData.filter(d => { return d['Team'].toLowerCase().includes(e.target.value)})
-                                var unsearchedData = currentData.filter(d => { return !d['Team'].toLowerCase().includes(e.target.value)})
+                                var searchedData = currentData.filter(d => { return d['Team'].toLowerCase().includes(e.target.value.toLowerCase())})
+                                var unsearchedData = currentData.filter(d => { return !d['Team'].toLowerCase().includes(e.target.value.toLowerCase())})
                             }
                             searchedData.forEach(d => {
                                 let team = d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
-                                d3.select(team['_groups'][0][0].children[0]).style("stroke", "white")
+                                d3.select(team['_groups'][0][0].children[0]).style("stroke", "lightgrey")
                             })
                             unsearchedData.forEach(d => {
                                 let team = d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
@@ -703,7 +704,7 @@
                 let histoSVG = d3.select("#histogram")
                 const histoWidth = histoSVG.attr("width");
                 const histoHeight = histoSVG.attr("height");
-                const histoMargin = { top: 5, right: 5, bottom: 100, left: 50};
+                const histoMargin = { top: 5, right: 5, bottom: 20, left: 50};
                 const histoAreaWidth = histoWidth - histoMargin.left - histoMargin.right;
                 const histoAreaHeight = histoHeight - histoMargin.top - histoMargin.bottom;
 
@@ -827,6 +828,10 @@
                 
 
                 // MAP
+
+                const map = d3.select("#choropleth")
+                const mapWidth = map.attr("width")
+
                 gdpData.forEach(metro => {
                     metro['2020'] = Number(metro['2020'])
                 })
@@ -872,10 +877,9 @@
                     }
                 });
 
-                const map = d3.select("#choropleth")
 
                 const us = await d3.json("/data/counties-10m.json");
-                var projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
+                var projection = d3.geoAlbersUsa().scale(mapWidth).translate([437.5, 305]);
                 var path = d3.geoPath().projection(projection);
 
                 var nation = topojson.feature(us, us.objects.nation);
@@ -900,19 +904,19 @@
                 map.append("rect")
                     .attr("fill", "black")
                     .attr("x", 0)
-                    .attr("y", 460)
+                    .attr("y", 425)
                     .attr("height", 170)
-                    .attr("width", 300)
+                    .attr("width", 293)
 
                 map.append("rect")
                     .attr("fill", "black")
-                    .attr("x", 300)
-                    .attr("y", 550)
+                    .attr("x", 280)
+                    .attr("y", 500)
                     .attr("height", 150)
                     .attr('width', 100)
 
                 const mouseover = map.append("g").attr("class","mouseover")
-                       .attr("transform",`translate(${0},${500})`)
+                       .attr("transform",`translate(${0},${460})`)
                        .raise();
 
                 const frame = mouseover.append("rect").attr("class","frame")
@@ -1053,6 +1057,103 @@
 
                 })
 
+                function doubleTeamClick(city, circle){
+                    circle = d3.select(circle)
+                    let x = circle.attr("cx")
+                    let y = circle.attr("cy")
+
+                    let popupHeight = 60
+                    let popupWidth = 130
+
+                    let popup = map.append("g")
+                        .attr("id", "popup")
+                        .attr("transform", `translate(${x - (popupWidth / 2)}, ${y - popupHeight - 30})`)
+                        .attr("width", popupWidth)
+                        .attr("height", popupHeight)
+                        .on("mouseout", function(){
+                            d3.selectAll("#popup").remove()
+                        })
+
+                    let background = popup.append("rect")
+                        .attr("width", popupWidth)
+                        .attr("height", popupHeight)
+                        .attr("fill", "white")
+                        .attr("stroke", "grey")
+                        .attr("rx", "4px")
+                        .attr("opacity", 0.9)
+
+                    // team 1
+                    let team1 = teamsMetroDict[city][0]
+                    let team1G = popup.append("g")
+                        .attr("width", popupWidth)
+                        .attr("opacity", 0.9)
+                        .style("cursor", "pointer")
+
+                    team1G.append("image").attr("href", teamLogoDict[city + " " + team1])
+                        .attr("transform", "translate(5, 5)")
+                        .attr("height", 20)
+                        .attr('width', 20)
+                    
+                    team1G.append("text").text(team1)
+                        .attr("transform", "translate(30, 9)")
+                        .style("alignment-baseline", "hanging")
+
+                    team1G.append("path").attr("d", "M 4 30 H 123")
+                        .attr("stroke", "grey")
+
+                    //mouseover rect
+                    team1G.append("rect")
+                        // .attr("transform", `translate(${x - (popupWidth / 2)}, ${y - popupHeight - 30})`)
+                        .attr("width", popupWidth)
+                        .attr("height", popupHeight/2)  
+                        .attr("opacity", "0")
+                        .style("cursor", "pointer")                  
+                        .on("click", function(e){
+                            let scatterID = null;
+
+                            scatterID = `#${city.replace(" ", "").replace(".", "").replace(",", "") + team1.replace(" ", "")}`;
+
+                            d3.select(scatterID).dispatch('click')
+                            d3.selectAll("#popup").remove()
+                        })
+
+                     // team 1
+                    let team2 = teamsMetroDict[city][1]
+                    let team2G = popup.append("g")
+                        .attr("width", popupWidth)
+                        .attr("opacity", 0.9)
+                        .style("border-bottom", "1px solid grey")
+                        .attr("transform", "translate(0, "+ (popupHeight/2 - 1) +")")
+
+
+                    team2G.append("image").attr("href", teamLogoDict[city + " " + team2])
+                        .attr("transform", "translate(5, 5)")
+
+                        .attr("height", 20)
+                        .attr('width', 20)
+                    
+                    team2G.append("text").text(team2)
+                        .attr("transform", "translate(30, 9)")
+                        .style("alignment-baseline", "hanging")
+
+                    //mouseover rect
+                    team2G.append("rect")
+                        // .attr("transform", `translate(${x - (popupWidth / 2)}, ${y - popupHeight - 30})`)
+                        .attr("width", popupWidth)
+                        .attr("height", popupHeight/2) 
+                        .attr("opacity", "0")
+                        .style("cursor", "pointer")                   
+                        .on("click", function(e){
+                            let scatterID = null;
+
+                            scatterID = `#${city.replace(" ", "").replace(".", "").replace(",", "") + team2.replace(" ", "")}`;
+
+                            d3.select(scatterID).dispatch('click')
+                            d3.selectAll("#popup").remove()
+                        })
+
+                }
+
                 //invisible nodes for mouseovers (to prevent logo interference)
                 let mouseoverNodes = map.selectAll("circle.mouseoverCircles").data(cityLocations)
                     .join("circle")
@@ -1069,6 +1170,10 @@
                         console.log(d)
                         mouseover.transition().duration(300).style("opacity",1);
                         updateMouseover(d, textbox);
+
+                        if (['New York', "Los Angeles", 'Chicago'].includes(d['city'])){
+                            doubleTeamClick(d['city'], this)
+                        }
                     })
                     .on("mouseout", function(){
                         mouseover.transition().duration(300).style("opacity",0);
