@@ -1115,10 +1115,6 @@
 
                             scatterID = `#${city.replace(" ", "").replace(".", "").replace(",", "") + team1.replace(" ", "")}`;
 
-                            if (team2=="Athletics"){
-                                scatterID = "#OaklandAthletics"
-                            }
-
                             d3.select(scatterID).dispatch('click')
                             d3.selectAll("#popup").remove()
                         })
