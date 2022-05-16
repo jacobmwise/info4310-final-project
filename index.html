@@ -1071,12 +1071,10 @@
 
                     let popup = map.append("g")
                         .attr("id", "popup")
-                        .attr("transform", `translate(${x - (popupWidth / 2)}, ${y - popupHeight - 30})`)
+                        .attr("transform", `translate(${x - (popupWidth / 2)}, ${y - popupHeight - 20})`)
                         .attr("width", popupWidth)
                         .attr("height", popupHeight)
-                        .on("mouseout", function(){
-                            d3.selectAll("#popup").remove()
-                        })
+                        
 
                     let background = popup.append("rect")
                         .attr("width", popupWidth)
@@ -1117,6 +1115,10 @@
 
                             scatterID = `#${city.replace(" ", "").replace(".", "").replace(",", "") + team1.replace(" ", "")}`;
 
+                            if (team2=="Athletics"){
+                                scatterID = "#OaklandAthletics"
+                            }
+
                             d3.select(scatterID).dispatch('click')
                             d3.selectAll("#popup").remove()
                         })
@@ -1126,7 +1128,6 @@
                     let team2G = popup.append("g")
                         .attr("width", popupWidth)
                         .attr("opacity", 0.9)
-                        .style("border-bottom", "1px solid grey")
                         .attr("transform", "translate(0, "+ (popupHeight/2 - 1) +")")
 
                     
@@ -1157,10 +1158,17 @@
                             let scatterID = null;
 
                             scatterID = `#${city.replace(" ", "").replace(".", "").replace(",", "") + team2.replace(" ", "")}`;
+                            if (team2=="Athletics"){
+                                scatterID = "#OaklandAthletics"
+                            }
 
                             d3.select(scatterID).dispatch('click')
                             d3.selectAll("#popup").remove()
                         })
+
+                    // popup.raise().on("mouseout", function(){
+                    //         d3.selectAll("#popup").remove()
+                    //     })
 
                 }
 
