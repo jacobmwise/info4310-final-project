@@ -100,11 +100,10 @@
                         <svg id="scatterplot" width="600" height="550"></svg>
                     </div>
 
-                    
-
                     <p>The map below plots the Gross Domestic Product (GDP) of every metropolitan area in MLB. This statistic, along with population, are key measures of market size, which directly correlate with how much revenue a team will bring in. Hover over a city to see its GDP and population, or click to see where the team ranks in the scatterplot above and in the sidebar.</p>
                     <svg id="choropleth" height="570" width="1015"></svg>
                 </div>
+
                 <div id="details-div" style="display: flex; flex-direction: column; width: 25%; padding-left: 12px; border-left-color: white; border-width: 1px; border-style: none none none solid;">
                     <div id="details-text" style="display: flex; flex-direction: column;  margin-bottom: 25px;"></div>
                     <h4 id="lineGraphHeader" style="display: none; text-align: center; margin: 0 0 4px;">Team Payroll Over Time</h4>
@@ -113,20 +112,18 @@
                     <svg id="histogram" height="230" width="300"></svg>
                 </div>
             </div>
+
             <div id="citations" style="margin: 35px auto;">
                 <h3>Data Sources:</h3>
-                <!-- <ul> -->
                     <p>MLB Win % and WS Data - <a href="https://www.teamrankings.com/mlb/stat/win-pct-all-games?date=2021-11-03">GraceNote/Nielsen via TeamRankings</a></p>
                     <p>MLB Annual Payroll Data - <a href="http://www.stevetheump.com/Payrolls.htm">AP/MLB via SteveTheUmp.com</a></p>
                     <p>Metro Area GDP Data (US) - <a href=https://apps.bea.gov/itable/iTable.cfm?ReqID=70&step=1&acrdn=5">US DOC Bureau of Economic Activity</a></p>
                     <p>Metro Area GDP Data (Toronto) - <a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3610046801&cubeTimeFrame.startYear=2011&cubeTimeFrame.endYear=2018&referencePeriods=20110101%2C20180101">Statistics Canada</a></p>
                     <p>City Population Data - <a href="https://www.biggestuscities.com/">Biggest US Cities</a></p>
                     <p>Geographic Coordinate Data - <a href="https://gist.github.com/Miserlou/c5cd8364bf9b2420bb29">NPM via Miserlou on GitHub Gist</a></p>
-
-                <!-- </ul> -->
             </div>
-
         </div>
+
         <script>
             const load = async function() {
                 let payrollData = await d3.csv("data/payroll.csv");
@@ -172,43 +169,42 @@
                         metroTeamsDict[team] = metro
                     })
                 })
-                console.log(metroTeamsDict)
 
                 let cities = []
                 let cityLocations = []
                 let citiesDict = {}
 
                 let teamLogoDict = {
-                    "Boston Red Sox": "logos/light/boston_l.svg",
-                    "New York Yankees": "logos/light/newyorky_l.svg",
-                    "New York Mets": "logos/light/newyorkm_l.svg",
-                    "Toronto Blue Jays": "logos/light/toronto_l.svg",
-                    "Philadelphia Phillies": "logos/light/philadelphia_l.svg",
-                    "Pittsburgh Pirates": "logos/light/pittsburgh_l.svg",
-                    "Baltimore Orioles": "logos/light/baltimore_l.svg",
-                    "Washington Nationals": "logos/light/washington_l.svg",
-                    "Detroit Tigers": "logos/light/detroit_l.svg",
-                    "Cleveland Guardians": "logos/light/cleveland_l.svg",
-                    "Cincinnati Reds": "logos/light/cincinnati_l.svg",
-                    "Atlanta Braves": "logos/light/atlanta_l.svg",
-                    "Tampa Bay Rays": "logos/light/tampabay_l.svg",
-                    "Miami Marlins": "logos/light/miami_l.svg",
-                    "Houston Astros": "logos/light/houston_l.svg",
-                    "Texas Rangers": "logos/light/dallas_l.svg",
-                    "Colorado Rockies": "logos/light/denver_l.svg",
-                    "Minnesota Twins": "logos/light/minneapolis_l.svg",
-                    "Milwaukee Brewers": "logos/light/milwaukee_l.svg",
-                    "Chicago Cubs": "logos/light/chicagoc_l.svg",
-                    "Chicago White Sox": "logos/light/chicagows_l.svg",
-                    "San Diego Padres": "logos/light/sandiego_l.svg",
-                    "Seattle Mariners": "logos/light/seattle_l.svg",
-                    "San Francisco Giants": "logos/light/sanfrancisco_l.svg",
-                    "Oakland Athletics": "logos/light/oakland_l.svg",
-                    "Los Angeles Dodgers": "logos/light/losangelesd_l.svg",
-                    "Los Angeles Angels": "logos/light/losangelesa_l.svg",
-                    "Kansas City Royals": "logos/light/kansascity_l.svg",
-                    "St. Louis Cardinals": "logos/light/stlouis_l.svg",
-                    "Arizona Diamondbacks": "logos/light/phoenix_l.svg"
+                    "Boston Red Sox": "logos/boston_l.svg",
+                    "New York Yankees": "logos/newyorky_l.svg",
+                    "New York Mets": "logos/newyorkm_l.svg",
+                    "Toronto Blue Jays": "logos/toronto_l.svg",
+                    "Philadelphia Phillies": "logos/philadelphia_l.svg",
+                    "Pittsburgh Pirates": "logos/pittsburgh_l.svg",
+                    "Baltimore Orioles": "logos/baltimore_l.svg",
+                    "Washington Nationals": "logos/washington_l.svg",
+                    "Detroit Tigers": "logos/detroit_l.svg",
+                    "Cleveland Guardians": "logos/cleveland_l.svg",
+                    "Cincinnati Reds": "logos/cincinnati_l.svg",
+                    "Atlanta Braves": "logos/atlanta_l.svg",
+                    "Tampa Bay Rays": "logos/tampabay_l.svg",
+                    "Miami Marlins": "logos/miami_l.svg",
+                    "Houston Astros": "logos/houston_l.svg",
+                    "Texas Rangers": "logos/dallas_l.svg",
+                    "Colorado Rockies": "logos/denver_l.svg",
+                    "Minnesota Twins": "logos/minneapolis_l.svg",
+                    "Milwaukee Brewers": "logos/milwaukee_l.svg",
+                    "Chicago Cubs": "logos/chicagoc_l.svg",
+                    "Chicago White Sox": "logos/chicagows_l.svg",
+                    "San Diego Padres": "logos/sandiego_l.svg",
+                    "Seattle Mariners": "logos/seattle_l.svg",
+                    "San Francisco Giants": "logos/sanfrancisco_l.svg",
+                    "Oakland Athletics": "logos/oakland_l.svg",
+                    "Los Angeles Dodgers": "logos/losangelesd_l.svg",
+                    "Los Angeles Angels": "logos/losangelesa_l.svg",
+                    "Kansas City Royals": "logos/kansascity_l.svg",
+                    "St. Louis Cardinals": "logos/stlouis_l.svg",
+                    "Arizona Diamondbacks": "logos/phoenix_l.svg"
                 }
 
                 populationData.forEach(city => {
@@ -243,7 +239,7 @@
                                 currCity = "#ColoradoRockies";
                             } 
                         } 
-                        teamLogoDict[d['Team']] = "logos/light/" + currCity.toLowerCase().replace(" ", "").replace(".", "") + "_l.svg"
+                        teamLogoDict[d['Team']] = "logos/" + currCity.toLowerCase().replace(" ", "").replace(".", "") + "_l.svg"
                     }
                 });
 
@@ -261,18 +257,18 @@
                             if (metro['Metropolitan Area'].includes(city['city'])){
                                 if ( ['New York', "Los Angeles", "Chicago", "Washington, DC", "San Francisco"].includes(city['city']) ){
                                     if (city['city']=="New York"){
-                                        city['logos'] = ["logos/light/newyorky_l.svg", "logos/light/newyorkm_l.svg"]
+                                        city['logos'] = ["logos/newyorky_l.svg", "logos/newyorkm_l.svg"]
                                     } else if (city['city']=="Los Angeles"){
-                                        city['logos'] = ["logos/light/losangelesd_l.svg", "logos/light/losangelesa_l.svg"]
+                                        city['logos'] = ["logos/losangelesd_l.svg", "logos/losangelesa_l.svg"]
                                     } else if (city['city']=="Chicago"){
-                                        city['logos'] = ["logos/light/chicagoc_l.svg", "logos/light/chicagows_l.svg"]
+                                        city['logos'] = ["logos/chicagoc_l.svg", "logos/chicagows_l.svg"]
                                     } else if (city['city']=="Washington, DC"){
-                                        city['logos'] = ["logos/light/washington_l.svg"]
+                                        city['logos'] = ["logos/washington_l.svg"]
                                     } else if (city['city']=="San Francisco"){
-                                        city['logos'] = ["logos/light/sanfrancisco_l.svg","logos/light/oakland_l.svg"]
+                                        city['logos'] = ["logos/sanfrancisco_l.svg","logos/oakland_l.svg"]
                                     } 
                                 } else {
-                                    city['logos'] = ["logos/light/" + city['city'].toLowerCase().replace(" ", "").replace(".", "") + "_l.svg"]
+                                    city['logos'] = ["logos/" + city['city'].toLowerCase().replace(" ", "").replace(".", "") + "_l.svg"]
                                 }
                             }
                         })
@@ -281,7 +277,6 @@
                     } 
                 })
 
-                // console.log(payrollData);
 
                 // SCATTER KEY
                 d3.select("svg#scatter-key").append("path").attr("d", d3.symbol().type(d3.symbolStar).size(125)).attr("fill", "gold").attr("transform","translate("+30+","+130+")")
@@ -360,7 +355,6 @@
                     return Number(String(str).substr(0, String(str).length-2))
                 }
 
-                
                 let selectedTeam = null;
                 let symbolMap = {'WSW': d3.symbol().type(d3.symbolStar).size(150), 'WSL': d3.symbol().type(d3.symbolStar).size(150), 'Y': d3.symbol().type(d3.symbolCircle).size(150), 'N': d3.symbol().type(d3.symbolCircle).size(150)}
                 let symbolMap2 = {'WSW': d3.symbol().type(d3.symbolStar).size(100), 'WSL': d3.symbol().type(d3.symbolStar).size(100), 'Y': d3.symbol().type(d3.symbolCircle).size(100), 'N': d3.symbol().type(d3.symbolCircle).size(100)}
@@ -378,23 +372,23 @@
 
                     leftAxis = d3.axisLeft(winsScale);
                     leftAxisG.transition().duration(350).call(leftAxis)
+
                     bottomAxis = d3.axisBottom(payrollScale);
                     bottomAxisG.transition().duration(350).call(bottomAxis)
                         .selectAll("text").text("")
-                        
                         .style("text-anchor", "start");
+
                     leftGridlines = d3.axisLeft(winsScale)
                                         .tickSize(-scatterAreaWidth-10)
                                         .tickFormat("")
                     leftGridlinesG.transition().duration(350).call(leftGridlines);
+
                     bottomGridlines = d3.axisBottom(payrollScale)
                                         .tickSize(-scatterAreaHeight-10)
                                         .tickFormat(function(d) { return d/1000000 + 'M'});
                     bottomGridlinesG.transition().duration(350).call(bottomGridlines);
                     
                     scatter.selectAll("svg").remove()
-
-                    
                     
                     let circles = scatter.selectAll("circle.team")
                         .data(currentData)
@@ -410,7 +404,6 @@
                                 .transition().duration(250)
                                 .attr("d", symbolMap[d['Playoffs']])
                                 
-
                             let tooltipWidth = 185;
                             let tooltipHeight = 60;
                             let tooltip = scatter.append("g")
@@ -418,20 +411,13 @@
                                 .attr("opacity", .4)
                                 .raise()
 
-                            console.log(payrollScale(d["Total Payroll"]))
+                            //set tooltip location and handle (literal) edge cases
                             let tooltipX = (-tooltipWidth/2) + getNumericPixelVal(payrollScale(d["Total Payroll"]))+scatterMargin.left
                             if ((tooltipX+(tooltipWidth)>=scatterAreaWidth+scatterMargin.left)){
                                 tooltipX = scatterAreaWidth+scatterMargin.left - (tooltipWidth)-2
-                                console.log("first case")
                             } else if (tooltipX<=scatterMargin.left) {
                                 tooltipX = scatterMargin.left + 2
-                                console.log("second case")
                             }
-                            // if (d['Total Payroll'] === payrollExtent[1]) {
-                            //     tooltipX = scatterAreaWidth+scatterMargin.left - (tooltipWidth)-2
-                            // }
-
-                            console.log(tooltipX)
 
                             let tooltipY = getNumericPixelVal(winsScale(d['Win%']))+scatterMargin.top-tooltipHeight-12
                             if ((tooltipY<=0)){
@@ -445,8 +431,8 @@
                                 .attr("y", tooltipY)
                                 .attr("rx", "5")
                                 .attr("ry", "5")
-                                .attr("width",tooltipWidth)
-                                .attr("height",tooltipHeight)
+                                .attr("width", tooltipWidth)
+                                .attr("height", tooltipHeight)
                                 .attr("stroke", "lightgrey")
                                 .attr("stroke-width", "1px")
 
@@ -465,6 +451,7 @@
                                 .attr("x", tooltipX+ 26)
                                 .attr("y", tooltipY + 8)
                                 .style("font-size", "13px");
+
                             let txt2 = tooltip.append("text")
                                 .text(`Total Payroll: $${Number(d['Total Payroll']).toLocaleString()}`)
                                 .attr("fill", "gray")
@@ -473,6 +460,7 @@
                                 .attr("x", tooltipX+5)
                                 .attr("y", tooltipY + 27)
                                 .style("font-size", "12px");
+
                             let txt3 = tooltip.append("text")
                                 .text(`Win%: ${(Number(d['Win%'])*100).toFixed(2)}%`)
                                 .attr("fill", "gray")
@@ -481,6 +469,7 @@
                                 .attr("x",tooltipX+5)
                                 .attr("y", tooltipY + 42)
                                 .style("font-size", "12px");
+
                             d3.select(".tooltip")
                                 .raise()
                                 .transition().duration(300)
@@ -498,14 +487,15 @@
                             d3.select(selectedCircle.children[0]).style("stroke", "goldenrod").style("stroke-width", 1.5)
                             d3.select("#" + selectedCircleID + " path").style("stroke", "black").style("stroke-width", "1.5px")
 
+                            //update selection
                             selectedCircleID = d3.select(this).attr("id")
                             selectedTeam = d['Team']
-                            // console.log(d['Total Payroll'])
+
+                            //clear current sidebar
                             d3.select("div#details-text").selectAll("h3").remove()
                             d3.select("div#details-text").selectAll("text").remove()
                             d3.select("div#details-text").selectAll("img").remove()
 
-                            // buildSearch()
                             let header =  d3.select("div#details-text").append("div").style("display", "flex").style("justify-content","center").style("align-items","center")
                             header.append("img").attr("src", teamLogoDict[d['Team']]).style("height", "35px").style("width", "35px").style("object-fit", "contain").style("margin-right", "10px")
                             header.append("h3").text(d['Team'])
@@ -521,7 +511,9 @@
                                 wins =  Math.round(162 * Number(d['Win%']))
                                 losses = 162 - wins
                             }
+
                             d3.select("div#details-text").append("text").text(`Win Percentage: ${d['Win%']} (${wins}-${losses})`).style("text-align", "left")
+
                             if (d['Playoffs'] === 'WSW') {
                                 d3.select("div#details-text").append("text").text("World Series Champion").style("text-align", "left")
                             } else if (d['Playoffs'] === 'WSL') {
@@ -541,7 +533,6 @@
 
                             d3.select("div#details-text").append("text").text(`Metro GDP: $${Number(citiesDict[thisMetro]['gdp']).toLocaleString()}`).style("text-align", "left")
 
-
                             updateLineGraph(d['Team'])
                             d3.select("#teamLineGraph").style("display", "block")
                             d3.select("#lineGraphHeader").style("display", "block")
@@ -554,8 +545,7 @@
                             d3.select(`rect#${d["Team"].split('.').join("").split(" ").join("")}`).attr("opacity", 1)
                         });
 
-                    
-
+                    //update symbols on scatter
                     currentData.forEach(d => {
                         if (d['Playoffs'] === 'WSW') {
                             d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
@@ -626,7 +616,6 @@
 
 
                 // TEAM LINE GRAPH
-
                 let lineSVG = d3.select("#teamLineGraph")
 
                 const lineWidth = lineSVG.attr("width");
@@ -639,32 +628,18 @@
                 const lineGraph = lineSVG.append("g").attr("transform","translate("+lineMargin.left+","+lineMargin.top+")")
 
                 let teamPayrollScale = d3.scaleLinear().domain([20000000,200000000]).range([lineAreaHeight, 0]);
-                // let defScale = d3.scaleLinear().domain([10, -10]).range([0, scatterAreaHeight]);
                 let timeScale = d3.scaleLinear().domain([2010.5,2021.5]).range([0, lineAreaWidth])
 
                 let leftAxisLine = d3.axisLeft(teamPayrollScale).tickFormat(function(d) { return d/1000000 + 'M'});
-                // let leftGridlines = d3.axisLeft(winsScale)
-                //                     .tickSize(-scatterAreaWidth-10)
-                //                     .tickFormat("")
-                // let leftGridlinesG = annotations.append("g")
-                //     .attr("class", "y gridlines")
-                //     .attr("transform",`translate(${scatterMargin.left-10},${scatterMargin.top})`)
-                //     .call(leftGridlines);
                 let leftAxisLineG = lineAnnotations.append("g")
                     .attr("class", "y axis")
                     .attr("transform",`translate(${lineMargin.left-10},${lineMargin.top})`)
                     .call(leftAxisLine)
                 
                 let bottomAxisLine = d3.axisBottom(timeScale).tickFormat((d,i) => {
-                  return i%2 !== 0 ? " ": String(d);
-                 });
-                // let bottomGridlines = d3.axisBottom(payrollScale)
-                //                         .tickSize(-scatterAreaHeight-10)
-                //                         .tickFormat(function(d) { return d/1000000 + 'M'});
-                // let bottomGridlinesG = annotations.append("g")
-                //     .attr("class", "x gridlines")
-                //     .attr("transform",`translate(${scatterMargin.left},${scatterAreaHeight+scatterMargin.top+10})`)
-                //     .call(bottomGridlines);
+                    return i%2 !== 0 ? " ": String(d);
+                    });
+
                 let bottomAxisLineG =  lineAnnotations.append("g")
                     .attr("class", "x axis")
                     .attr("transform",`translate(${lineMargin.left},${lineAreaHeight+lineMargin.top})`)
@@ -677,6 +652,7 @@
                     .style("fill", "white")
                     .style("font-size", 8)
                     .attr('text-anchor', 'middle')
+
                 lineGraph.append('g')
                     .attr('transform', 'translate(' + 2 + ', ' + (lineAreaHeight/2 + lineMargin.top) + ')')
                     .append('text')
@@ -685,7 +661,6 @@
                     .style("font-size", 8)
                     .attr('text-anchor', 'middle')
                     .attr('transform', 'rotate(-90)')
-
 
                 function updateLineGraph(team) {
                     currentTeamData = payrollData.filter(x => { return x['Team'] === team});
@@ -696,21 +671,6 @@
 
                     leftAxisLine = d3.axisLeft(teamPayrollScale).tickFormat(function(d) { return d/1000000 + 'M'});;
                     leftAxisLineG.transition().duration(350).call(leftAxisLine)
-                    // bottomAxisLine = d3.axisBottom(payrollScale);
-                    // bottomAxisG.transition().duration(350).call(bottomAxis)
-                        // .selectAll("text").text("")
-                        
-                        // .style("text-anchor", "start");
-                    // leftGridlines = d3.axisLeft(winsScale)
-                    //                     .tickSize(-scatterAreaWidth-10)
-                    //                     .tickFormat("")
-                    // leftGridlinesG.transition().duration(350).call(leftGridlines);
-                    // bottomGridlines = d3.axisBottom(payrollScale)
-                    //                     .tickSize(-scatterAreaHeight-10)
-                    //                     .tickFormat(function(d) { return d/1000000 + 'M'});
-                    // bottomGridlinesG.transition().duration(350).call(bottomGridlines);
-                    
-                    // lineGraph.selectAll("svg").remove()
 
                     var lineGen = d3.line()
                         .x(d => timeScale(d['Year']))
@@ -769,8 +729,6 @@
                         .attr("transform",`translate(${histoMargin.left-10},${histoMargin.top})`)
                         .call(leftAxisHisto)
                     
-                    
-
                     let teamPayrolls= {}
                     currentData.forEach(d => {
                         if (d['Team'].includes('Sox')) {
@@ -787,12 +745,6 @@
                         .attr("class", "xaxis")
                         .attr("transform",`translate(${histoMargin.left},${histoAreaHeight+histoMargin.top})`)
                         .call(bottomAxisHisto)
-                        // .selectAll("text")
-                        // .attr("y", 0)
-                        // .attr("x", 9)
-                        // .attr("dy", ".35em")
-                        // .attr("transform", "rotate(90)")
-                        // .style("text-anchor", "start");
 
                     d3.select("g.xaxis").selectAll(".tick").remove()
 
@@ -812,7 +764,6 @@
                         .style("fill", "white")
                         .style("font-size", 10)
                         .attr('text-anchor', 'middle')
-                        // .attr('transform', 'rotate(-90)')
 
                     histogram.selectAll('rect.bar').data(currentData)
                         .join('rect').attr("class", "bar")
@@ -821,7 +772,6 @@
                         .attr("x", function(d) {
                             if (d['Team'].includes('Sox')) {
                                 let name = d['Team'].split(' ') 
-                                // teamPayrolls[name.at(-2) + ' ' + name.at(-1)] = d['Total Payroll']
                                 return teamScale(name.at(-2) + ' ' + name.at(-1))
                             } else {
                                 return teamScale(d["Team"].split(' ').at(-1))
@@ -831,13 +781,8 @@
                         .attr("height", d => (payrollScaleHisto(1) - payrollScaleHisto(d["Total Payroll"]) - (payrollScaleHisto(1) - payrollScaleHisto(payrollExtent[0]))))
                         .attr("width", 10)
                         .attr("opacity", 0.7)
-                        // .attr("transform","translate("+histoMargin.left+","+histoMargin.top+")")
                 }
                 buildHisto()
-
-                
-
-
 
 
                 // SLIDER
@@ -864,13 +809,11 @@
                 slider.on('change', function(e) {
                     plotCircles(e.target.value);
                     buildHisto()
-                    // updateLineGraph(selectedTeam)
                     d3.select("#" + selectedCircleID).dispatch('click')
                 });
                 
 
                 // MAP
-
                 const map = d3.select("#choropleth")
                 const mapWidth = map.attr("width")
 
@@ -879,10 +822,7 @@
                 })
 
                 let gdpExtent = d3.extent(gdpData, d => d['2020']);
-
                 let gdpScale = d3.scaleLinear().domain(gdpExtent).range([20, 80]);
-
-                
 
                 //map team logos and gdps to cities
                 cityLocationsRaw.forEach(city => {
@@ -892,18 +832,18 @@
                                 city['gdp'] = metro['2020']
                                 if ( ['New York', "Los Angeles", "Chicago", "Washington, DC", "San Francisco"].includes(city['city']) ){
                                     if (city['city']=="New York"){
-                                        city['logos'] = ["logos/light/newyorky_l.svg", "logos/light/newyorkm_l.svg"]
+                                        city['logos'] = ["logos/newyorky_l.svg", "logos/newyorkm_l.svg"]
                                     } else if (city['city']=="Los Angeles"){
-                                        city['logos'] = ["logos/light/losangelesd_l.svg", "logos/light/losangelesa_l.svg"]
+                                        city['logos'] = ["logos/losangelesd_l.svg", "logos/losangelesa_l.svg"]
                                     } else if (city['city']=="Chicago"){
-                                        city['logos'] = ["logos/light/chicagoc_l.svg", "logos/light/chicagows_l.svg"]
+                                        city['logos'] = ["logos/chicagoc_l.svg", "logos/chicagows_l.svg"]
                                     } else if (city['city']=="Washington, DC"){
-                                        city['logos'] = ["logos/light/washington_l.svg"]
+                                        city['logos'] = ["logos/washington_l.svg"]
                                     } else if (city['city']=="San Francisco"){
-                                        city['logos'] = ["logos/light/sanfrancisco_l.svg","logos/light/oakland_l.svg"]
+                                        city['logos'] = ["logos/sanfrancisco_l.svg","logos/oakland_l.svg"]
                                     } 
                                 } else {
-                                    city['logos'] = ["logos/light/" + city['city'].toLowerCase().replace(" ", "").replace(".", "") + "_l.svg"]
+                                    city['logos'] = ["logos/" + city['city'].toLowerCase().replace(" ", "").replace(".", "") + "_l.svg"]
                                 }
                             }
                         })
@@ -911,7 +851,6 @@
                         citiesDict[city['city']] = city
                     } 
                 })
-                
 
                 payrollData.forEach(d => {
                     if (d['Playoffs'] === "") {
@@ -991,12 +930,12 @@
                 
                 }
 
+                //add circle groups to map
                 var nodes = map.append("g").selectAll("g").data(cityLocations)
                     .enter().append("g")
                         .attr("class", "circleG")
                         .attr("id", d => d['city'].toLowerCase().replace(" ", "").replace(".", "").replace(",", ""))
                         .attr("transform", d => `translate(${projection([d['longitude'], d['latitude']])[0]}, ${ projection([d['longitude'], d['latitude']])[1]})`)
-                        // .attr("y", d => projection([d['longitude'], d['latitude']])[1])
                     .append("circle")
                     .attr("r", d => gdpScale(d['gdp']))
                     .attr("opacity", 0.6)
@@ -1005,75 +944,14 @@
                     .attr("cy", 0)
                     .attr("data-city", d => d['city'])
                     .attr("stroke", "white")
-                    // .on("mouseover", function(e, d){
-                    //     console.log(d)
-                    //     mouseover.transition().duration(300).style("opacity",1);
-                    //     updateMouseover(d, textbox);
-                    // })
-                    // .on("mouseout", function(){
-                    //     mouseover.transition().duration(300).style("opacity",0);
-                    // })
 
-                    var simulation = d3.forceSimulation()
-                        // .force("center", d3.forceCenter().x(300).y(200)) // Attraction to the center of the svg area
-                        // .force("charge", d3.forceManyBody().strength(0.5)) // Nodes are attracted one each other of value is > 0
-                        .force("collide", d3.forceCollide().strength(0.2).radius(d => gdpScale(d['gdp'])).iterations(1)) // Force that avoids circle overlapping
-                        .force("x", d3.forceX(d => projection([d['longitude'], d['latitude']])[0]))
-                        .force("y", d3.forceY(d => projection([d['longitude'], d['latitude']])[1]))
+                //Simulation to avoid circle overlapping
+                var simulation = d3.forceSimulation()
+                    .force("collide", d3.forceCollide().strength(0.2).radius(d => gdpScale(d['gdp'])).iterations(1))
+                    .force("x", d3.forceX(d => projection([d['longitude'], d['latitude']])[0]))
+                    .force("y", d3.forceY(d => projection([d['longitude'], d['latitude']])[1]))
 
-
-                    
-
-                    // simulation
-                    //     .nodes(cityLocations)
-                    //     .on("tick", function(d){
-                    //     nodes
-                    //         // .attr("cx", d => projection([d['longitude'], d['latitude']])[0])
-                    //         // .attr("cy", d => projection([d['longitude'], d['latitude']])[1])
-                    //     });
-
-                    var simulation = d3.forceSimulation()
-                        .force("collide", d3.forceCollide().strength(0.2).radius(d => gdpScale(d['gdp'])).iterations(1)) // Force that avoids circle overlapping
-                        .force("x", d3.forceX(d => projection([d['longitude'], d['latitude']])[0]))
-                        .force("y", d3.forceY(d => projection([d['longitude'], d['latitude']])[1]))
-
-                // // add pseudo locations to display cities' second teams
-                // cityLocations.push(
-                //     {
-                //         "city": "Queens", 
-                //         "latitude": 40.8127837, 
-                //         "longitude": -73.2059413, 
-                //         "state": "New York",
-                //         "logos": ["logos/light/newyorkm_l.svg"]
-                //     }
-                // )
-                // cityLocations.push(
-                //     {
-                //         "city": "Anaheim", 
-                //         "latitude": 33.6922342, 
-                //         "longitude": -117.5436849, 
-                //         "state": "California",
-                //         "logos": ["logos/light/losangelesa_l.svg"]
-                //     })
-                // cityLocations.push(
-                //     {
-                //         "city": "South Chicago", 
-                //         "latitude": 41.2781136, 
-                //         "longitude": -87.6297982, 
-                //         "state": "Illinois",
-                //         "logos": ["logos/light/chicagows_l.svg"]
-                //     })
-
-                // cityLocations.push(
-                //     {
-                //         "city": "Oakland", 
-                //         "latitude": 38.4043637, 
-                //         "longitude": -122.2711137, 
-                //         "state": "Illinois",
-                //         "logos": ["logos/light/oakland_l.svg"]
-                //     })
-               
-                //add logos into circles
+                //add logos into circle groups
                 nodes._groups[0].forEach(function(node){
                     let circle = d3.select(node)
                     let city = citiesDict[circle.attr("data-city")]
@@ -1113,7 +991,6 @@
                         .attr("width", popupWidth)
                         .attr("height", popupHeight)
                         
-
                     let background = popup.append("rect")
                         .attr("width", popupWidth)
                         .attr("height", popupHeight)
@@ -1141,30 +1018,26 @@
                     team1G.append("path").attr("d", "M 4 30 H 123")
                         .attr("stroke", "grey")
 
-                    //mouseover rect
+                    //mouseover rect for team 1
                     team1G.append("rect")
-                        // .attr("transform", `translate(${x - (popupWidth / 2)}, ${y - popupHeight - 30})`)
                         .attr("width", popupWidth)
                         .attr("height", popupHeight/2)  
                         .attr("opacity", "0")
                         .style("cursor", "pointer")                  
                         .on("click", function(e){
-                            let scatterID = null;
-
-                            scatterID = `#${city.replace(" ", "").replace(".", "").replace(",", "") + team1.replace(" ", "")}`;
+                            let scatterID = `#${city.replace(" ", "").replace(".", "").replace(",", "") + team1.replace(" ", "")}`;
 
                             d3.select(scatterID).dispatch('click')
                             d3.selectAll("#popup").remove()
                         })
 
-                     // team 1
+                    // team 2
                     let team2 = teamsMetroDict[city][1]
                     let team2G = popup.append("g")
                         .attr("width", popupWidth)
                         .attr("opacity", 0.9)
                         .attr("transform", "translate(0, "+ (popupHeight/2 - 1) +")")
 
-                    
                     if (teamsMetroDict[city][1] === 'Athletics') {
                         team2G.append("image").attr("href", teamLogoDict["Oakland " + team2])
                             .attr("transform", "translate(5, 5)")
@@ -1181,9 +1054,8 @@
                         .attr("transform", "translate(30, 9)")
                         .style("alignment-baseline", "hanging")
 
-                    //mouseover rect
+                    //team 2 mouseover rect
                     team2G.append("rect")
-                        // .attr("transform", `translate(${x - (popupWidth / 2)}, ${y - popupHeight - 30})`)
                         .attr("width", popupWidth)
                         .attr("height", popupHeight/2) 
                         .attr("opacity", "0")
@@ -1199,10 +1071,6 @@
                             d3.select(scatterID).dispatch('click')
                             d3.selectAll("#popup").remove()
                         })
-
-                    // popup.raise().on("mouseout", function(){
-                    //         d3.selectAll("#popup").remove()
-                    //     })
 
                 }
 
@@ -1259,7 +1127,7 @@
                 })
                 parentNodes = d3.selectAll(parentNodes)
 
-                //run simulation
+                //run simulation for display circles and mouseover circles
                 simulation
                     .nodes(cityLocations)
                     .on("tick", function(d){
@@ -1269,16 +1137,13 @@
                         mouseoverNodes
                             .attr("cx", d => d.x )
                             .attr("cy", d => d.y )
-                        
                     });
 
 
                 function highlightMapCircle(fullteam){
+                    //highlights circle on map when clicked from scattergraph
                     let thisMetro = null;
                     Object.keys(metroTeamsDict).forEach(function(team){
-                    // teamsMetroDict[metro].forEach(function(team){
-                    //     metroTeamsDict[team] = metro
-                    // })
                         if (fullteam.includes(team)){
                             thisMetro=metroTeamsDict[team]
                         }
