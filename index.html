@@ -365,6 +365,7 @@
                 let symbolMap = {'WSW': d3.symbol().type(d3.symbolStar).size(150), 'WSL': d3.symbol().type(d3.symbolStar).size(150), 'Y': d3.symbol().type(d3.symbolCircle).size(150), 'N': d3.symbol().type(d3.symbolCircle).size(150)}
                 let symbolMap2 = {'WSW': d3.symbol().type(d3.symbolStar).size(100), 'WSL': d3.symbol().type(d3.symbolStar).size(100), 'Y': d3.symbol().type(d3.symbolCircle).size(100), 'N': d3.symbol().type(d3.symbolCircle).size(100)}
                 let selectedCircleID = null;
+                let selectedCircle;
 
                 function plotCircles(year) {
                     currentData = payrollData.filter(x => { return x['Year'] === year});
@@ -393,6 +394,7 @@
                     
                     scatter.selectAll("svg").remove()
 
+                    
                     
                     let circles = scatter.selectAll("circle.team")
                         .data(currentData)
@@ -492,8 +494,9 @@
                             d3.selectAll(".tooltip").remove()
                         })
                         .on("click", function(e, d) {
-                            d3.select("#" + selectedCircleID + " path").transition().duration(250).attr("stroke", "none").attr("stroke-width", "0")
-                            d3.select(this.children[0]).transition().duration(250).attr("stroke", "white").attr("stroke-width", "1.5px")
+                            selectedCircle = this;
+                            d3.select(selectedCircle.children[0]).style("stroke", "goldenrod").style("stroke-width", 1.5)
+                            d3.select("#" + selectedCircleID + " path").style("stroke", "black").style("stroke-width", "1.5px")
 
                             selectedCircleID = d3.select(this).attr("id")
                             selectedTeam = d['Team']
@@ -589,8 +592,8 @@
 
                 // SCATTER SEARCH
                 function buildSearch() {
-                    d3.select("div#scatter-key-container").append("p").text("Search teams:").style("margin", "10px 0 4px 30px").style("text-align", "left")
-                    d3.select("div#scatter-key-container").append("input").attr("type", "text").style("color", "black").style("width", "185px")
+                    d3.select("div#scatter-key-container").append("p").text("Search teams:").style("margin-top", "10px")
+                    d3.select("div#scatter-key-container").append("input").attr("id", "searchbar").attr("type", "text").style("color", "black")
                         .on("input", function(e) {
                             if (e.target.value === "") {
                                 console.log("empty search")
@@ -601,14 +604,22 @@
                                 var unsearchedData = currentData.filter(d => { return !d['Team'].toLowerCase().includes(e.target.value.toLowerCase())})
                             }
                             searchedData.forEach(d => {
-                                let team = d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
-                                d3.select(team['_groups'][0][0].children[0]).style("stroke", "lightgrey")
+                                if (selectedCircle && d['Team'] === selectedCircle.getAttribute('value')) {
+                                    d3.select(selectedCircle.children[0]).style("stroke", "goldenrod").style("stroke-width", 1.5)
+                                } else {
+                                    let team = d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
+                                    d3.select(team['_groups'][0][0].children[0]).style("stroke", "white").style("stroke-width", 1.5)
+                                }
                             })
                             unsearchedData.forEach(d => {
-                                let team = d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
-                                d3.select(team['_groups'][0][0].children[0]).style("stroke", "black")
+                                if (selectedCircle && d['Team'] === selectedCircle.getAttribute('value')) {
+                                    d3.select(selectedCircle.children[0]).style("stroke", "goldenrod").style("stroke-width", 1.5)
+                                } else {
+                                    let team = d3.select(`svg#${d['Team'].split('.').join("").split(" ").join("")}`)
+                                    d3.select(team['_groups'][0][0].children[0]).style("stroke", "black").style("stroke-width", 1.5)
+                                }
                             })
-                        });   
+                        });
                 }
                 buildSearch()
                 d3.select("div#details-text").append("h3").text("Click a team to view details")
