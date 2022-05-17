@@ -82,6 +82,9 @@
                     the difference in payrolls amongst MLB teams is drastic and widening.
                     We aim to explore teams' payrolls and geographic markets with the goal of investigating whether this competitive advantage truly translates to winning.
                 </p>
+                <p style="font-size: 12px;"><em>
+                   *Note: Salary figures from the 2020 pandemic-shortened season were prorated to 37% of their actual value, which is reflected in this data and appears as a dip in spending for all teams.
+                </em></p>
             </div>
 
             <div id = "content" style="display: flex;">
@@ -406,22 +409,29 @@
                                 .attr("d", symbolMap[d['Playoffs']])
                                 
 
-                            let tooltipWidth = 180;
-                            let tooltipHeight = 70;
+                            let tooltipWidth = 185;
+                            let tooltipHeight = 60;
                             let tooltip = scatter.append("g")
                                 .attr("class","tooltip")
                                 .attr("opacity", .4)
                                 .raise()
+
+                            console.log(payrollScale(d["Total Payroll"]))
                             let tooltipX = (-tooltipWidth/2) + getNumericPixelVal(payrollScale(d["Total Payroll"]))+scatterMargin.left
                             if ((tooltipX+(tooltipWidth)>=scatterAreaWidth+scatterMargin.left)){
                                 tooltipX = scatterAreaWidth+scatterMargin.left - (tooltipWidth)-2
+                                console.log("first case")
                             } else if (tooltipX<=scatterMargin.left) {
                                 tooltipX = scatterMargin.left + 2
+                                console.log("second case")
                             }
-                            if (d['Total Payroll'] === payrollExtent[1]) {
-                                tooltipX = scatterAreaWidth+scatterMargin.left - (tooltipWidth)-2
-                            }
-                            let tooltipY = getNumericPixelVal(winsScale(d['Win%']))+scatterMargin.top-tooltipHeight-15
+                            // if (d['Total Payroll'] === payrollExtent[1]) {
+                            //     tooltipX = scatterAreaWidth+scatterMargin.left - (tooltipWidth)-2
+                            // }
+
+                            console.log(tooltipX)
+
+                            let tooltipY = getNumericPixelVal(winsScale(d['Win%']))+scatterMargin.top-tooltipHeight-12
                             if ((tooltipY<=0)){
                                 tooltipY = getNumericPixelVal(winsScale(d['Win%']))+scatterMargin.top+15
                             }
@@ -437,13 +447,21 @@
                                 .attr("height",tooltipHeight)
                                 .attr("stroke", "lightgrey")
                                 .attr("stroke-width", "1px")
+
+                            let tooltipLogo = tooltip.append("image")
+                                .attr("href", teamLogoDict[d['Team']])
+                                .attr("height", "16px")
+                                .attr("width", "16px")
+                                .attr("x", tooltipX + 5)
+                                .attr("y", tooltipY + 5)
+
                             let txt = tooltip.append("text")
                                 .text(d['Team'])
                                 .attr("fill", "black")
                                 .attr("text-anchor","left")
                                 .attr("alignment-baseline","hanging")
-                                .attr("x", tooltipX+5)
-                                .attr("y", tooltipY + 5)
+                                .attr("x", tooltipX+ 26)
+                                .attr("y", tooltipY + 8)
                                 .style("font-size", "13px");
                             let txt2 = tooltip.append("text")
                                 .text(`Total Payroll: $${Number(d['Total Payroll']).toLocaleString()}`)
@@ -451,7 +469,7 @@
                                 .attr("text-anchor","left")
                                 .attr("alignment-baseline","hanging")
                                 .attr("x", tooltipX+5)
-                                .attr("y", tooltipY + 25)
+                                .attr("y", tooltipY + 27)
                                 .style("font-size", "12px");
                             let txt3 = tooltip.append("text")
                                 .text(`Win%: ${(Number(d['Win%'])*100).toFixed(2)}%`)
@@ -459,7 +477,7 @@
                                 .attr("text-anchor","left")
                                 .attr("alignment-baseline","hanging")
                                 .attr("x",tooltipX+5)
-                                .attr("y", tooltipY + 40)
+                                .attr("y", tooltipY + 42)
                                 .style("font-size", "12px");
                             d3.select(".tooltip")
                                 .raise()
@@ -571,8 +589,8 @@
 
                 // SCATTER SEARCH
                 function buildSearch() {
-                    d3.select("div#scatter-key-container").append("p").text("Search teams:").style("margin-top", "10px")
-                    d3.select("div#scatter-key-container").append("input").attr("type", "text").style("color", "black")
+                    d3.select("div#scatter-key-container").append("p").text("Search teams:").style("margin", "10px 0 4px 30px").style("text-align", "left")
+                    d3.select("div#scatter-key-container").append("input").attr("type", "text").style("color", "black").style("width", "185px")
                         .on("input", function(e) {
                             if (e.target.value === "") {
                                 console.log("empty search")
@@ -732,9 +750,9 @@
 
                     histoAnnotations.selectAll("g").remove()
                     let payrollExtent = d3.extent(currentData, d => d['Total Payroll']);
-                    payrollScale = d3.scaleLinear().domain([payrollExtent[0]-500000, payrollExtent[1]+500000]).range([histoAreaHeight, 0]);
+                    let payrollScaleHisto = d3.scaleLinear().domain([payrollExtent[0]-500000, payrollExtent[1]+500000]).range([histoAreaHeight, 0]);
 
-                    let leftAxisHisto = d3.axisLeft(payrollScale).tickFormat(function(d) { return d/1000000 + 'M'});
+                    let leftAxisHisto = d3.axisLeft(payrollScaleHisto).tickFormat(function(d) { return d/1000000 + 'M'});
                     let leftAxisHistoG = histoAnnotations.append("g")
                         .attr("class", "y axis")
                         .attr("transform",`translate(${histoMargin.left-10},${histoMargin.top})`)
@@ -798,8 +816,8 @@
                                 return teamScale(d["Team"].split(' ').at(-1))
                             }
                         })
-                        .attr("y", d => payrollScale(d["Total Payroll"]))
-                        .attr("height", d => (payrollScale(1) - payrollScale(d["Total Payroll"]) - (payrollScale(1) - payrollScale(payrollExtent[0]))))
+                        .attr("y", d => payrollScaleHisto(d["Total Payroll"]))
+                        .attr("height", d => (payrollScaleHisto(1) - payrollScaleHisto(d["Total Payroll"]) - (payrollScaleHisto(1) - payrollScaleHisto(payrollExtent[0]))))
                         .attr("width", 10)
                         .attr("opacity", 0.7)
                         // .attr("transform","translate("+histoMargin.left+","+histoMargin.top+")")
@@ -816,7 +834,7 @@
                     .attr('type', 'range').attr('id', 'yearSlider').attr('step', 1)
                     .attr('min', 2011).attr('max', 2021).attr('value', 2021)
                     .attr("list", "steplist")
-                    .style("width", "300px")
+                    .style("width", "240px")
                     .style("margin", "0 15px 0 0")
 
                 //slider ticks
@@ -826,11 +844,11 @@
                     datalist.append("option").html(i)
                 }
 
-                d3.select('div#slider').append('label').attr('id', 'sliderLabel').text('2021')
+                d3.select('div#slider').append('label').attr('id', 'sliderLabel').text('2021').style("display", "block")
                 slider.on('input', function(e) {
                     d3.select('label#sliderLabel').text(e.target.value);
                 });
-                d3.select('div#sliderDiv').append('label').text('Year')
+                d3.select('div#sliderDiv').append('label').text('Year').style("margin-bottom", "12px")
 
                 slider.on('change', function(e) {
                     plotCircles(e.target.value);
