@@ -411,22 +411,15 @@
                                 .attr("opacity", .4)
                                 .raise()
 
-<<<<<<< HEAD
-=======
                             //set tooltip location and handle (literal) edge cases
->>>>>>> 9d521f1677e55a7504e77ff2d9a27bd5cbc1da7a
+
                             let tooltipX = (-tooltipWidth/2) + getNumericPixelVal(payrollScale(d["Total Payroll"]))+scatterMargin.left
                             if ((tooltipX+(tooltipWidth)>=scatterAreaWidth+scatterMargin.left)){
                                 tooltipX = scatterAreaWidth+scatterMargin.left - (tooltipWidth)-2
                             } else if (tooltipX<=scatterMargin.left) {
                                 tooltipX = scatterMargin.left + 2
                             }
-<<<<<<< HEAD
-                            // if (d['Total Payroll'] === payrollExtent[1]) {
-                            //     tooltipX = scatterAreaWidth+scatterMargin.left - (tooltipWidth)-2
-                            // }
-=======
->>>>>>> 9d521f1677e55a7504e77ff2d9a27bd5cbc1da7a
+                            
 
                             let tooltipY = getNumericPixelVal(winsScale(d['Win%']))+scatterMargin.top-tooltipHeight-12
                             if ((tooltipY<=0)){
@@ -495,7 +488,6 @@
                             selectedCircle = this;
                             d3.select("#" + selectedCircleID + " path").style("stroke", "black").style("stroke-width", "1.5px")
                             d3.select(selectedCircle.children[0]).style("stroke", "goldenrod").style("stroke-width", 1.5)
-                            
 
                             //update selection
                             selectedCircleID = d3.select(this).attr("id")
