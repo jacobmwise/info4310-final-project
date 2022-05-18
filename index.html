@@ -418,7 +418,6 @@
                                 .attr("opacity", .4)
                                 .raise()
 
-                            console.log(payrollScale(d["Total Payroll"]))
                             let tooltipX = (-tooltipWidth/2) + getNumericPixelVal(payrollScale(d["Total Payroll"]))+scatterMargin.left
                             if ((tooltipX+(tooltipWidth)>=scatterAreaWidth+scatterMargin.left)){
                                 tooltipX = scatterAreaWidth+scatterMargin.left - (tooltipWidth)-2
@@ -430,8 +429,6 @@
                             // if (d['Total Payroll'] === payrollExtent[1]) {
                             //     tooltipX = scatterAreaWidth+scatterMargin.left - (tooltipWidth)-2
                             // }
-
-                            console.log(tooltipX)
 
                             let tooltipY = getNumericPixelVal(winsScale(d['Win%']))+scatterMargin.top-tooltipHeight-12
                             if ((tooltipY<=0)){
@@ -495,8 +492,9 @@
                         })
                         .on("click", function(e, d) {
                             selectedCircle = this;
-                            d3.select(selectedCircle.children[0]).style("stroke", "goldenrod").style("stroke-width", 1.5)
                             d3.select("#" + selectedCircleID + " path").style("stroke", "black").style("stroke-width", "1.5px")
+                            d3.select(selectedCircle.children[0]).style("stroke", "goldenrod").style("stroke-width", 1.5)
+                            
 
                             selectedCircleID = d3.select(this).attr("id")
                             selectedTeam = d['Team']
